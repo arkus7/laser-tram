@@ -1,29 +1,28 @@
-# README #
+# Pixi.JS TypeScript boilerplate
 
-This README would normally document whatever steps are necessary to get your application up and running.
+I had a hard time setting up a development environment, so I decided to share it.
 
-### What is this repository for? ###
+It can be useful to start from there if you want to start developping a game for browsers quickly.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+This setup is supposed to be used with VS Code, as configuration is provided so that you hava all tools set up.
 
-### How do I get set up? ###
+## Requirements
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+-   Node JS and NPM
+-   VS Code
+-   Chrome
 
-### Contribution guidelines ###
+## Setup
 
-* Writing tests
-* Code review
-* Other guidelines
+```bash
+npm install
+```
 
-### Who do I talk to? ###
+## Development
 
-* Repo owner or admin
-* Other community or team contact
+Launch the `Complete development` launch configuration.
+
+Putting/removing breakpoints in the `.ts` files with VS Code in `/src` should work.
+If it does not, please open an issue.
+
+Edit the TypeScript files, the browser should refresh on save.
