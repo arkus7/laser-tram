@@ -79,7 +79,7 @@ export class Application {
     this.objectList.push(testObject1);
     this.objectList.push(normalZombie, brainiacZombie);
 
-    // this.objectList.push(bar);
+    this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
