@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js';
 
 import { SpriteObject } from '../interfaces/spriteObject';
-import { assetsForZombie } from './utils';
+import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
 
 export type ZombieConstructorParams = {
@@ -14,7 +14,7 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   public speed: number;
   private type: ZombieType;
   private state: ZombieState;
-  private needsStateUpdate: boolean = false;
+  private needsAnimationUpdate: boolean = false;
 
   static texturesForType(type: ZombieType, state: ZombieState): PIXI.Texture[] {
     const assets = assetsForZombie(type).filter((x) => x.includes(state));
@@ -38,17 +38,37 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   public setState(state: ZombieState): void {
+    if (this.state === state) {
+      return;
+    }
     this.state = state;
-    this.needsStateUpdate = true;
+    this.needsAnimationUpdate = true;
   }
 
   onUpdate(delta: number): void {
-    if (this.needsStateUpdate) {
-      this.textures = BaseZombie.texturesForType(this.type, this.state);
-      this.needsStateUpdate = false;
+    if (this.needsAnimationUpdate) {
+      this.changeAnimationTo(this.state);
+      this.play();
+      this.needsAnimationUpdate = false;
+    }
+
+    if (this.x < 200) {
+      this.setState(ZombieState.Dead);
+    }
+
+    if (this.state === ZombieState.Dead) {
+      if (this.currentFrame === spritesPerZombieState(ZombieState.Dead) - 1) {
+        this.stop();
+      } else {
+        this.y += 1;
+      }
     }
 
     this.x -= this.speed * delta;
+  }
+
+  private changeAnimationTo(state: ZombieState) {
+    this.textures = BaseZombie.texturesForType(this.type, state);
   }
 
   onResize(width: number, height: number): void {
