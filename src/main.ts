@@ -38,7 +38,6 @@ export class Application {
       .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
       .add('assets/sprites/tram.png')
       .add('assets/sprites/map.jpg')
-      .add('assets/sprites/cat.png')
       .load(() => this.setup());
   }
 
@@ -57,12 +56,10 @@ export class Application {
     const map = new Map(this.app);
     const player = new Player(this.app);
     const bar = new HealthBar(this.app); //main bar for train hp
-    const testObject1 = new Prop(this.app, 'assets/sprites/cat.png', true);
 
     await map.create();
     await player.create();
     await bar.create(90, 20, 100, 100, false);
-    await testObject1.create(400, this.app.renderer.screen.height - 85);
 
     const normalZombie = new NormalZombie();
     this.app.stage.addChild(normalZombie);
@@ -76,9 +73,7 @@ export class Application {
     this.objectList = new Array();
     this.objectList.push(map);
     this.objectList.push(player);
-    this.objectList.push(testObject1);
     this.objectList.push(normalZombie, brainiacZombie);
-
     this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
