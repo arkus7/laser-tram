@@ -33,6 +33,7 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
 
     this.x = 500;
     this.y = 900;
+    this.anchor.x = 1;
     this.scale.set(-0.15, 0.15);
 
     this.speed = 1;
@@ -72,7 +73,15 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.textures = BaseZombie.texturesForType(this.type, state);
   }
 
+  isCollisable(): boolean {
+    return true;
+  }
+
   onResize(width: number, height: number): void {
     throw new Error('Method not implemented.');
+  }
+
+  onCollision(object: SpriteObject): void {
+    //
   }
 }

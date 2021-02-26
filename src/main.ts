@@ -10,13 +10,14 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
+import { Collisions } from './collisions';
 
 export class Application {
   private app: PIXI.Application;
   private width = window.innerWidth;
   private height = window.innerHeight;
 
-  private objectList: Array<SpriteObject>;
+  private objectList: Array<PIXI.Container & SpriteObject>;
 
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
@@ -34,6 +35,8 @@ export class Application {
 
     PIXI.Loader.shared
       .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
+      .add('assets/sprites/tram.png')
+      .add('assets/sprites/map.jpg')
       .load(() => this.setup());
   }
 
@@ -70,7 +73,6 @@ export class Application {
     this.objectList.push(map);
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
-
     this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
@@ -81,6 +83,8 @@ export class Application {
   };
 
   private play = (delta: number): void => {
+    Collisions.checkForCollisions(this.objectList);
+
     this.objectList.forEach((object) => {
       object.onUpdate(delta);
     });
