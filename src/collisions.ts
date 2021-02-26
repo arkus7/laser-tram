@@ -8,7 +8,7 @@ interface CollisionsExtraFields {
   halfHeight: number;
 }
 export class Collisions {
-  public static checkForCollisions(objects: Array<PIXI.Container & SpriteObject>) {
+  public static checkForCollisions(objects: Array<PIXI.Container & SpriteObject>): void {
     const collisableObjects = objects.filter((object) => object.isCollisable());
     for (let i = 0; i < collisableObjects.length; i++) {
       for (let j = 0; j < collisableObjects.length; j++) {
@@ -27,12 +27,12 @@ export class Collisions {
     object1: PIXI.Container & Partial<CollisionsExtraFields>,
     object2: PIXI.Container & Partial<CollisionsExtraFields>
   ): boolean {
-    let hit = false;
+    let hit: boolean = false;
 
-    let combinedHalfWidths;
-    let combinedHalfHeights;
-    let vx;
-    let vy;
+    let combinedHalfWidths: number;
+    let combinedHalfHeights: number;
+    let vx: number;
+    let vy: number;
 
     object1.centerX = object1.x + object1.width / 2;
     object1.centerY = object1.y + object1.height / 2;
