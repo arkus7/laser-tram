@@ -10,7 +10,6 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
-import { Prop } from './prop';
 import { Collisions } from './collisions';
 
 export class Application {
