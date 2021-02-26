@@ -23,16 +23,18 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
 
   constructor({ type, initialState = ZombieState.Attack, autoUpdate = true }: ZombieConstructorParams) {
     super(BaseZombie.texturesForType(type, initialState), autoUpdate);
+
     this.type = type;
     this.state = initialState;
 
     this.animationSpeed = 0.2;
     this.play();
 
-    this.x = 0;
-    this.y = 0;
+    this.x = 500;
+    this.y = 900;
+    this.scale.set(-0.15, 0.15);
 
-    this.speed = 0;
+    this.speed = 1;
   }
 
   public setState(state: ZombieState): void {
