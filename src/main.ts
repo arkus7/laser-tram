@@ -5,6 +5,8 @@ import { Player } from './player';
 import { Map } from './map';
 import { SpriteObject } from './interfaces/spriteObject';
 import { HealthBar } from './healthbar';
+import { Prop } from './prop';
+import { Collisions } from './collisions';
 
 export class Application {
   private app: PIXI.Application;
@@ -44,18 +46,25 @@ export class Application {
   private async setup(): Promise<void> {
     const map = new Map(this.app);
     const player = new Player(this.app);
-    const bar = new HealthBar(this.app);  //main bar for train hp
+    const bar = new HealthBar(this.app); //main bar for train hp
+    const testObject1 = new Prop(this.app, '/assets/sprites/cat.png');
+    const collisions = new Collisions(this.app);
 
     await map.create();
     await player.create();
     await bar.create(90, 20, 100, 100, false);
+    await testObject1.create(400, this.app.renderer.screen.height - 85);
 
     this.objectList = new Array();
     this.objectList.push(map);
     this.objectList.push(player);
     this.objectList.push(bar);
-    
+
     this.app.ticker.add((delta) => this.gameLoop(delta));
+    this.app.ticker.add((delta) => {
+      const result = collisions.checkForCollision(player.getSprite(), testObject1.getSprite());
+      console.log('test', 'result', result);
+    });
   }
 
   private gameLoop = (delta: number): void => {

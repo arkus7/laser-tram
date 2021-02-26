@@ -29,6 +29,10 @@ export class Player implements SpriteObject {
     this.app.stage.addChild(this.player);
   }
 
+  public getSprite(): PIXI.Sprite {
+    return this.player;
+  }
+
   public getPosition(): { x: number; y: number } {
     return {
       x: this.player.x,
