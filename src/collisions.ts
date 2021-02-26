@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+
 import { SpriteObject } from './interfaces/spriteObject';
 
 interface CollisionsExtraFields {

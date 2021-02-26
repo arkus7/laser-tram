@@ -1,4 +1,5 @@
 import * as PIXI from 'pixi.js';
+
 import { SpriteObject } from './interfaces/spriteObject';
 import { Keyboard } from './keyboard';
 
@@ -10,7 +11,7 @@ export class Player extends PIXI.Sprite implements SpriteObject {
 
   private static readonly SPEED = 5;
   private static readonly VERTICAL_TELEPORT = 70;
-  private static readonly NUM_OF_TRACKS = 3;
+  private static readonly NUM_OF_TRACKS = 5;
   private static readonly START_TRACK_RELATIVE_POSITION_Y = 15;
 
   constructor(app) {
@@ -19,6 +20,8 @@ export class Player extends PIXI.Sprite implements SpriteObject {
   }
 
   public async create(): Promise<void> {
+    this.scale.set(2, 2);
+
     this.x = 15;
     this.y = this.app.renderer.screen.height - this.height - Player.START_TRACK_RELATIVE_POSITION_Y;
 
