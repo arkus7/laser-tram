@@ -1,10 +1,15 @@
 import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
-import { Player } from './player';
-import { Map } from './map';
-import { SpriteObject } from './interfaces/spriteObject';
+
 import { HealthBar } from './healthbar';
+import { SpriteObject } from './interfaces/spriteObject';
+import { Map } from './map';
+import { Player } from './player';
+import { BrainiacZombie } from './zombie/brainiac-zombie';
+import { NormalZombie } from './zombie/normal-zombie';
+import { assetsForZombie } from './zombie/utils';
+import { ZombieType } from './zombie/zombie-enums';
 
 export class Application {
   private app: PIXI.Application;
@@ -27,7 +32,9 @@ export class Application {
     window.addEventListener('resize', this.resize);
     mainElement.appendChild(this.app.view);
 
-    this.setup();
+    PIXI.Loader.shared
+      .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
+      .load(() => this.setup());
   }
 
   private resize = (): void => {
@@ -44,17 +51,28 @@ export class Application {
   private async setup(): Promise<void> {
     const map = new Map(this.app);
     const player = new Player(this.app);
-    const bar = new HealthBar(this.app);  //main bar for train hp
+    const bar = new HealthBar(this.app); //main bar for train hp
 
     await map.create();
     await player.create();
     await bar.create(90, 20, 100, 100, false);
 
+    const normalZombie = new NormalZombie();
+    this.app.stage.addChild(normalZombie);
+
+    const brainiacZombie = new BrainiacZombie();
+    brainiacZombie.x = 550;
+    brainiacZombie.y = 850;
+
+    this.app.stage.addChild(brainiacZombie);
+
     this.objectList = new Array();
     this.objectList.push(map);
     this.objectList.push(player);
+    this.objectList.push(normalZombie, brainiacZombie);
+
     this.objectList.push(bar);
-    
+
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
 
