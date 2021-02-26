@@ -2,22 +2,31 @@ import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
 
+import { Collisions } from './collisions';
 import { HealthBar } from './healthbar';
 import { SpriteObject } from './interfaces/spriteObject';
-import { Map } from './map';
+import { ParallaxMap } from './parallax-map';
 import { Player } from './player';
 import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
-import { Collisions } from './collisions';
 
+const postapo4MapSprites = [
+  'assets/sprites/map/postapo4/bg.png',
+  'assets/sprites/map/postapo4/rail&wall.png',
+  'assets/sprites/map/postapo4/train.png',
+  'assets/sprites/map/postapo4/columns&floor.png',
+  'assets/sprites/map/postapo4/infopost&wires.png',
+  'assets/sprites/map/postapo4/floor&underfloor.png',
+  'assets/sprites/map/postapo4/wires.png',
+];
 export class Application {
   private app: PIXI.Application;
   private width = window.innerWidth;
   private height = window.innerHeight;
 
-  private objectList: Array<PIXI.Container & SpriteObject>;
+  private objectList: Array<SpriteObject & PIXI.Container> = new Array();
 
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
@@ -30,11 +39,13 @@ export class Application {
       autoDensity: true,
     });
 
-    window.addEventListener('resize', this.resize);
+    window.addEventListener('resize', () => this.resize());
     mainElement.appendChild(this.app.view);
 
     PIXI.Loader.shared
-      .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
+      .add(assetsForZombie(ZombieType.Normal))
+      .add(assetsForZombie(ZombieType.Brainiac))
+      .add(postapo4MapSprites)
       .add('assets/sprites/tram.png')
       .add('assets/sprites/map.jpg')
       .load(() => this.setup());
@@ -52,11 +63,17 @@ export class Application {
   };
 
   private async setup(): Promise<void> {
-    const map = new Map(this.app);
     const player = new Player(this.app);
     const bar = new HealthBar(this.app); //main bar for train hp
 
-    await map.create();
+    const parallaxMap = new ParallaxMap({
+      renderer: this.app.renderer,
+      assets: postapo4MapSprites,
+    });
+
+    this.app.stage.addChild(parallaxMap);
+    this.objectList.push(parallaxMap);
+
     await player.create();
     await bar.create(90, 20, 100, 100, false);
 
@@ -64,13 +81,11 @@ export class Application {
     this.app.stage.addChild(normalZombie);
 
     const brainiacZombie = new BrainiacZombie();
-    brainiacZombie.x = 550;
+    brainiacZombie.x = 1550;
     brainiacZombie.y = 850;
 
     this.app.stage.addChild(brainiacZombie);
 
-    this.objectList = new Array();
-    this.objectList.push(map);
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
     this.objectList.push(bar);

@@ -31,10 +31,11 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.animationSpeed = 0.2;
     this.play();
 
-    this.x = 500;
+    this.x = 1200;
     this.y = 900;
+
+    this.scale.set(-0.25, 0.25);
     this.anchor.x = 1;
-    this.scale.set(-0.15, 0.15);
 
     this.speed = 1;
   }
