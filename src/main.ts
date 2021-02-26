@@ -5,6 +5,7 @@ import * as PIXI from 'pixi.js';
 import { SpriteObject } from './interfaces/spriteObject';
 import { Map } from './map';
 import { Player } from './player';
+import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
@@ -56,11 +57,17 @@ export class Application {
     const normalZombie = new NormalZombie();
     this.app.stage.addChild(normalZombie);
 
+    const brainiacZombie = new BrainiacZombie();
+    brainiacZombie.x = 550;
+    brainiacZombie.y = 850;
+
+    this.app.stage.addChild(brainiacZombie);
+
     this.objectList = new Array();
 
     this.objectList.push(map);
     this.objectList.push(player);
-    this.objectList.push(normalZombie);
+    this.objectList.push(normalZombie, brainiacZombie);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
