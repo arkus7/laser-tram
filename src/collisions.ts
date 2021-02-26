@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js';
 
 import { SpriteObject } from './interfaces/spriteObject';
 
-interface Extra {
+interface CollisionsExtraFields {
   centerX: number;
   centerY: number;
   halfWidth: number;
@@ -15,7 +15,10 @@ export class Collisions implements SpriteObject {
     this.app = app;
   }
 
-  public checkForCollision(object1: PIXI.Sprite & Partial<Extra>, object2: PIXI.Sprite & Partial<Extra>) {
+  public checkForCollision(
+    object1: PIXI.Sprite & Partial<CollisionsExtraFields>,
+    object2: PIXI.Sprite & Partial<CollisionsExtraFields>
+  ) {
     let hit = false;
 
     let combinedHalfWidths;
