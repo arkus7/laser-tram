@@ -2,9 +2,18 @@ import * as PIXI from 'pixi.js';
 
 import { SpriteObject } from './interfaces/spriteObject';
 
+interface ParallaxMapParams {
+  renderer: PIXI.Renderer;
+  assets: string[];
+  rate?: number;
+}
+
 export class ParallaxMap extends PIXI.Container implements SpriteObject {
-  constructor(renderer: PIXI.Renderer, assets: string[], public rate: number = 1.28) {
+  private scrollingRate: number;
+
+  constructor({ renderer, assets, rate = 1.28 }: ParallaxMapParams) {
     super();
+    this.scrollingRate = rate;
 
     this.x = 0;
     this.y = 0;
@@ -22,7 +31,7 @@ export class ParallaxMap extends PIXI.Container implements SpriteObject {
   onUpdate(delta: number): void {
     this.children.map((child, index) => {
       if (child instanceof PIXI.TilingSprite) {
-        child.tilePosition.x -= this.rate * (index + 1);
+        child.tilePosition.x -= this.scrollingRate * (index + 1);
       }
     });
   }
