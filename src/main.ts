@@ -4,6 +4,7 @@ import * as PIXI from 'pixi.js';
 import { Player } from './player';
 import { Map } from './map';
 import { SpriteObject } from './interfaces/spriteObject';
+import { HealthBar } from './healthbar';
 
 export class Application {
   private app: PIXI.Application;
@@ -43,15 +44,18 @@ export class Application {
   private async setup(): Promise<void> {
     const map = new Map(this.app);
     const player = new Player(this.app);
+    const bar = new HealthBar(this.app);
 
     await map.create();
     await player.create();
-
+    await bar.create();
+    //bar.onChangeHP(100); how to change hp - may be positive or negative
     this.objectList = new Array();
 
     this.objectList.push(map);
     this.objectList.push(player);
-
+    this.objectList.push(bar);
+    
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
 
