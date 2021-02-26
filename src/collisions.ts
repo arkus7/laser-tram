@@ -1,5 +1,4 @@
 import * as PIXI from 'pixi.js';
-
 import { SpriteObject } from './interfaces/spriteObject';
 
 interface CollisionsExtraFields {
@@ -8,17 +7,26 @@ interface CollisionsExtraFields {
   halfWidth: number;
   halfHeight: number;
 }
-export class Collisions implements SpriteObject {
-  private app: PIXI.Application;
+export class Collisions {
+  public static checkForCollisions(objects: Array<PIXI.Container & SpriteObject>) {
+    const collisableObjects = objects.filter((object) => object.isCollisable());
+    for (let i = 0; i < collisableObjects.length; i++) {
+      for (let j = 0; j < collisableObjects.length; j++) {
+        if (i === j) {
+          continue;
+        }
 
-  constructor(app) {
-    this.app = app;
+        if (Collisions.checkForCollision(collisableObjects[i], collisableObjects[j])) {
+          collisableObjects[i].onCollision(collisableObjects[j]);
+        }
+      }
+    }
   }
 
-  public checkForCollision(
-    object1: PIXI.Sprite & Partial<CollisionsExtraFields>,
-    object2: PIXI.Sprite & Partial<CollisionsExtraFields>
-  ) {
+  public static checkForCollision(
+    object1: PIXI.Container & Partial<CollisionsExtraFields>,
+    object2: PIXI.Container & Partial<CollisionsExtraFields>
+  ): boolean {
     let hit = false;
 
     let combinedHalfWidths;
@@ -54,16 +62,4 @@ export class Collisions implements SpriteObject {
 
     return hit;
   }
-
-  public onUpdate = (delta: number): void => {
-    //
-  };
-
-  public onResize = (width: number, height: number): void => {
-    // to be implemented
-  };
-
-  public onCollision = (object: SpriteObject): void => {
-    //
-  };
 }

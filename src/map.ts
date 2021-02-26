@@ -1,32 +1,34 @@
 import * as PIXI from 'pixi.js';
 
-import { loadTilingSprite } from './helpers';
 import { SpriteObject } from './interfaces/spriteObject';
 
-export class Map implements SpriteObject {
+export class Map extends PIXI.TilingSprite implements SpriteObject {
   private app: PIXI.Application;
-  private map: PIXI.TilingSprite;
 
   constructor(app) {
+    super(PIXI.Loader.shared.resources['assets/sprites/map.jpg'].texture);
     this.app = app;
   }
 
   public async create(): Promise<void> {
-    this.map = await loadTilingSprite(this.app, 'assets/sprites/map.jpg');
-    this.map.x = 0;
-    this.map.y = 0;
-    this.map.width = this.app.screen.width;
-    this.map.height = this.app.screen.height;
+    this.x = 0;
+    this.y = 0;
+    this.width = this.app.screen.width;
+    this.height = this.app.screen.height;
 
-    this.app.stage.addChild(this.map);
+    this.app.stage.addChild(this);
+  }
+
+  public isCollisable(): boolean {
+    return false;
   }
 
   public onResize(width: number, height: number): void {
-    this.map.width = width;
+    this.width = width;
   }
 
   public onUpdate = (delta: number): void => {
-    this.map.tilePosition.x -= delta * 8;
+    this.tilePosition.x -= delta * 8;
   };
 
   public onCollision = (object: SpriteObject): void => {

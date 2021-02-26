@@ -72,11 +72,15 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.textures = BaseZombie.texturesForType(this.type, state);
   }
 
+  isCollisable(): boolean {
+    return true;
+  }
+
   onResize(width: number, height: number): void {
     throw new Error('Method not implemented.');
   }
 
   onCollision(object: SpriteObject): void {
-    throw new Error('Method not implemented.');
+    //
   }
 }

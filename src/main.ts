@@ -18,7 +18,7 @@ export class Application {
   private width = window.innerWidth;
   private height = window.innerHeight;
 
-  private objectList: Array<SpriteObject>;
+  private objectList: Array<PIXI.Container & SpriteObject>;
 
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
@@ -36,6 +36,9 @@ export class Application {
 
     PIXI.Loader.shared
       .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
+      .add('assets/sprites/tram.png')
+      .add('assets/sprites/map.jpg')
+      .add('assets/sprites/cat.png')
       .load(() => this.setup());
   }
 
@@ -55,7 +58,6 @@ export class Application {
     const player = new Player(this.app);
     const bar = new HealthBar(this.app); //main bar for train hp
     const testObject1 = new Prop(this.app, '/assets/sprites/cat.png');
-    const collisions = new Collisions(this.app);
 
     await map.create();
     await player.create();
@@ -76,13 +78,9 @@ export class Application {
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
 
-    this.objectList.push(bar);
+    // this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
-    this.app.ticker.add((delta) => {
-      const result = collisions.checkForCollision(player.getSprite(), testObject1.getSprite());
-      console.log('test', 'result', result);
-    });
   }
 
   private gameLoop = (delta: number): void => {
@@ -90,6 +88,8 @@ export class Application {
   };
 
   private play = (delta: number): void => {
+    Collisions.checkForCollisions(this.objectList);
+
     this.objectList.forEach((object) => {
       object.onUpdate(delta);
     });
