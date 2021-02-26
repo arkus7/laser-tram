@@ -53,8 +53,4 @@ export class HealthBar extends PIXI.Container implements SpriteObject {
   public onResize = (width: number, height: number): void => {
     this.y = height - this.height - 15;
   };
-
-  public onCollision = (object: SpriteObject): void => {
-    //
-  };
 }

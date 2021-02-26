@@ -5,5 +5,5 @@ export interface SpriteObject {
 
   onResize(width: number, height: number): void;
 
-  onCollision(object: SpriteObject): void;
+  onCollision?(object: SpriteObject): void;
 }

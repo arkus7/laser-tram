@@ -17,7 +17,7 @@ export class Collisions {
         }
 
         if (Collisions.checkForCollision(collisableObjects[i], collisableObjects[j])) {
-          collisableObjects[i].onCollision(collisableObjects[j]);
+          collisableObjects[i]?.onCollision(collisableObjects[j]);
         }
       }
     }

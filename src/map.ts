@@ -30,8 +30,4 @@ export class Map extends PIXI.TilingSprite implements SpriteObject {
   public onUpdate = (delta: number): void => {
     this.tilePosition.x -= delta * 8;
   };
-
-  public onCollision = (object: SpriteObject): void => {
-    //
-  };
 }
