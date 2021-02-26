@@ -2,6 +2,7 @@ import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
 
+import { HealthBar } from './healthbar';
 import { SpriteObject } from './interfaces/spriteObject';
 import { Map } from './map';
 import { Player } from './player';
@@ -50,9 +51,11 @@ export class Application {
   private async setup(): Promise<void> {
     const map = new Map(this.app);
     const player = new Player(this.app);
+    const bar = new HealthBar(this.app); //main bar for train hp
 
     await map.create();
     await player.create();
+    await bar.create(90, 20, 100, 100, false);
 
     const normalZombie = new NormalZombie();
     this.app.stage.addChild(normalZombie);
@@ -64,10 +67,11 @@ export class Application {
     this.app.stage.addChild(brainiacZombie);
 
     this.objectList = new Array();
-
     this.objectList.push(map);
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
+
+    this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
