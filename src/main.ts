@@ -45,13 +45,13 @@ export class Application {
     const map = new Map(this.app);
     const player = new Player(this.app);
     const bar = new HealthBar(this.app);
+    const bar2 = new HealthBar(this.app);
 
     await map.create();
     await player.create();
-    await bar.create();
-    //bar.onChangeHP(100); how to change hp - may be positive or negative
-    this.objectList = new Array();
+    await bar.create(90, 20, 100, 100, false);
 
+    this.objectList = new Array();
     this.objectList.push(map);
     this.objectList.push(player);
     this.objectList.push(bar);

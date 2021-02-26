@@ -3,27 +3,30 @@ import { SpriteObject } from './interfaces/spriteObject';
 
 export class HealthBar implements SpriteObject {
     private app: PIXI.Application;
-    private healthBar: PIXI.Container & { outer?: PIXI.Graphics };
+    private healthBar: PIXI.Container & { outer?: PIXI.Graphics;  x?: number; y?: number, moving?: boolean };
     constructor(app) {
       this.app = app;
     }
   
-    public async create(): Promise<void> {
+    public async create(x: number, y: number, widthRed: number, widthBlack: number, moving: boolean): Promise<void> {
         this.healthBar = new PIXI.Container();
-        this.healthBar.position.set(90, 20)
+        this.healthBar.moving = moving;
+        this.healthBar.x = x; 
+        this.healthBar.y = y;
+        this.healthBar.position.set(this.healthBar.x, this.healthBar.y);
         this.app.stage.addChild(this.healthBar);
         
         //Create the black background rectangle
         let innerBar = new PIXI.Graphics();
         innerBar.beginFill(0x000000);
-        innerBar.drawRect(0, 0, 128, 30);
+        innerBar.drawRect(0, 0, widthBlack, 30);
         innerBar.endFill();
         this.healthBar.addChild(innerBar);
         
         //Create the front red rectangle
         let outerBar = new PIXI.Graphics();
         outerBar.beginFill(0xFF3300);
-        outerBar.drawRect(0, 0, 128, 25);
+        outerBar.drawRect(0, 0, widthRed, 25);
         outerBar.endFill();
         this.healthBar.addChild(outerBar);
         
@@ -32,9 +35,15 @@ export class HealthBar implements SpriteObject {
     }
     
     public onUpdate = (delta: number): void => {
-
+    
     };
   
+    public onMove = (delta: number, newX: number, newY: number): void => {
+        if (this.healthBar.moving) {
+            this.healthBar.x = newX;
+            this.healthBar.y = newY;
+        }
+    }
     public onChangeHP = (width: number): void => {
         this.healthBar.outer.width = width;
     };
