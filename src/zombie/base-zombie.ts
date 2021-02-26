@@ -4,6 +4,12 @@ import { SpriteObject } from '../interfaces/spriteObject';
 import { assetsForZombie } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
 
+export type ZombieConstructorParams = {
+  type: ZombieType;
+  initialState?: ZombieState;
+  autoUpdate?: boolean;
+};
+
 export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject {
   public speed: number;
   private type: ZombieType;
@@ -15,7 +21,7 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     return assets.map((assetPath) => PIXI.Loader.shared.resources[assetPath].texture);
   }
 
-  constructor(type: ZombieType, initialState: ZombieState = ZombieState.Attack, autoUpdate: boolean = true) {
+  constructor({ type, initialState = ZombieState.Attack, autoUpdate = true }: ZombieConstructorParams) {
     super(BaseZombie.texturesForType(type, initialState), autoUpdate);
     this.type = type;
     this.state = initialState;
