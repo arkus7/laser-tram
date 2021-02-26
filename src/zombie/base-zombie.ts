@@ -12,6 +12,7 @@ export type ZombieConstructorParams = {
 
 export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject {
   public speed: number;
+
   private type: ZombieType;
   private state: ZombieState;
   private needsAnimationUpdate: boolean = false;
@@ -67,7 +68,7 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.x -= this.speed * delta;
   }
 
-  private changeAnimationTo(state: ZombieState) {
+  private changeAnimationTo(state: ZombieState): void {
     this.textures = BaseZombie.texturesForType(this.type, state);
   }
 
