@@ -1,8 +1,6 @@
 import * as PIXI from 'pixi.js';
-import { loadSprite } from './helpers';
 import { SpriteObject } from './interfaces/spriteObject';
 import { Keyboard } from './keyboard';
-import { assetsForZombie } from './zombie/utils';
 
 export class Player extends PIXI.Sprite implements SpriteObject {
   private app: PIXI.Application;
@@ -101,6 +99,6 @@ export class Player extends PIXI.Sprite implements SpriteObject {
   };
 
   public onCollision = (object: SpriteObject): void => {
-    console.log('test', 'tram collision! with');
+    console.log('test', 'tram collision! with', object);
   };
 }

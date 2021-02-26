@@ -57,7 +57,7 @@ export class Application {
     const map = new Map(this.app);
     const player = new Player(this.app);
     const bar = new HealthBar(this.app); //main bar for train hp
-    const testObject1 = new Prop(this.app, '/assets/sprites/cat.png');
+    const testObject1 = new Prop(this.app, 'assets/sprites/cat.png', true);
 
     await map.create();
     await player.create();
@@ -76,6 +76,7 @@ export class Application {
     this.objectList = new Array();
     this.objectList.push(map);
     this.objectList.push(player);
+    this.objectList.push(testObject1);
     this.objectList.push(normalZombie, brainiacZombie);
 
     // this.objectList.push(bar);
