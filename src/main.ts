@@ -44,8 +44,7 @@ export class Application {
   private async setup(): Promise<void> {
     const map = new Map(this.app);
     const player = new Player(this.app);
-    const bar = new HealthBar(this.app);
-    const bar2 = new HealthBar(this.app);
+    const bar = new HealthBar(this.app);  //main bar for train hp
 
     await map.create();
     await player.create();
