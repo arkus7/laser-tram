@@ -1,10 +1,15 @@
 import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
-import { Player } from './player';
-import { Map } from './map';
-import { SpriteObject } from './interfaces/spriteObject';
+
 import { HealthBar } from './healthbar';
+import { SpriteObject } from './interfaces/spriteObject';
+import { Map } from './map';
+import { Player } from './player';
+import { BrainiacZombie } from './zombie/brainiac-zombie';
+import { NormalZombie } from './zombie/normal-zombie';
+import { assetsForZombie } from './zombie/utils';
+import { ZombieType } from './zombie/zombie-enums';
 import { Prop } from './prop';
 import { Collisions } from './collisions';
 
@@ -29,7 +34,9 @@ export class Application {
     window.addEventListener('resize', this.resize);
     mainElement.appendChild(this.app.view);
 
-    this.setup();
+    PIXI.Loader.shared
+      .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
+      .load(() => this.setup());
   }
 
   private resize = (): void => {
@@ -55,9 +62,20 @@ export class Application {
     await bar.create(90, 20, 100, 100, false);
     await testObject1.create(400, this.app.renderer.screen.height - 85);
 
+    const normalZombie = new NormalZombie();
+    this.app.stage.addChild(normalZombie);
+
+    const brainiacZombie = new BrainiacZombie();
+    brainiacZombie.x = 550;
+    brainiacZombie.y = 850;
+
+    this.app.stage.addChild(brainiacZombie);
+
     this.objectList = new Array();
     this.objectList.push(map);
     this.objectList.push(player);
+    this.objectList.push(normalZombie, brainiacZombie);
+
     this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
