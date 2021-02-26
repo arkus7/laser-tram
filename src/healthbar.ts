@@ -51,5 +51,9 @@ export class HealthBar implements SpriteObject {
     public onResize = (width: number, height: number): void => {
       this.healthBar.y = height -  this.healthBar.height - 15;
     };
+
+    public onCollision = (object: SpriteObject): void => {
+      //
+    };
   }
   

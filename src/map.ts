@@ -9,7 +9,6 @@ export class Map implements SpriteObject {
 
   constructor(app) {
     this.app = app;
-    const texture = PIXI.Texture.from('assets/sprites/map.jpg');
   }
 
   public async create(): Promise<void> {
@@ -28,5 +27,9 @@ export class Map implements SpriteObject {
 
   public onUpdate = (delta: number): void => {
     this.map.tilePosition.x -= delta * 8;
+  };
+
+  public onCollision = (object: SpriteObject): void => {
+    //
   };
 }

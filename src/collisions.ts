@@ -59,4 +59,8 @@ export class Collisions implements SpriteObject {
   public onResize = (width: number, height: number): void => {
     // to be implemented
   };
+
+  public onCollision = (object: SpriteObject): void => {
+    //
+  };
 }

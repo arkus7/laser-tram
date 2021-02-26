@@ -32,4 +32,8 @@ export class Prop implements SpriteObject {
   public onUpdate = (delta: number): void => {
     //
   };
+
+  public onCollision = (object: SpriteObject): void => {
+    //
+  };
 }
