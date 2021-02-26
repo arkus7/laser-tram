@@ -2,6 +2,7 @@ import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
 
+import { Collisions } from './collisions';
 import { HealthBar } from './healthbar';
 import { SpriteObject } from './interfaces/spriteObject';
 import { ParallaxMap } from './parallax-map';
@@ -24,7 +25,7 @@ export class Application {
   private width = window.innerWidth;
   private height = window.innerHeight;
 
-  private objectList: Array<SpriteObject> = new Array();
+  private objectList: Array<SpriteObject & PIXI.Container> = new Array();
 
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
@@ -44,6 +45,8 @@ export class Application {
       .add(assetsForZombie(ZombieType.Normal))
       .add(assetsForZombie(ZombieType.Brainiac))
       .add(postapo4MapSprites)
+      .add('assets/sprites/tram.png')
+      .add('assets/sprites/map.jpg')
       .load(() => this.setup());
   }
 
@@ -84,7 +87,6 @@ export class Application {
 
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
-
     this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
@@ -95,6 +97,8 @@ export class Application {
   };
 
   private play = (delta: number): void => {
+    Collisions.checkForCollisions(this.objectList);
+
     this.objectList.forEach((object) => {
       object.onUpdate(delta);
     });

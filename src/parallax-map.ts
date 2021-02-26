@@ -28,6 +28,10 @@ export class ParallaxMap extends PIXI.Container implements SpriteObject {
     }
   }
 
+  isCollisable(): boolean {
+    return false;
+  }
+
   onUpdate(delta: number): void {
     this.children.map((child, index) => {
       if (child instanceof PIXI.TilingSprite) {
