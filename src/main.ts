@@ -1,9 +1,13 @@
 import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
-import { Player } from './player';
-import { Map } from './map';
+
 import { SpriteObject } from './interfaces/spriteObject';
+import { Map } from './map';
+import { Player } from './player';
+import { NormalZombie } from './zombie/normal-zombie';
+import { assetsForZombie } from './zombie/utils';
+import { ZombieType } from './zombie/zombie-enums';
 
 export class Application {
   private app: PIXI.Application;
@@ -26,7 +30,9 @@ export class Application {
     window.addEventListener('resize', this.resize);
     mainElement.appendChild(this.app.view);
 
-    this.setup();
+    PIXI.Loader.shared
+      .add([...assetsForZombie(ZombieType.Normal), ...assetsForZombie(ZombieType.Brainiac)])
+      .load(() => this.setup());
   }
 
   private resize = (): void => {
@@ -47,10 +53,14 @@ export class Application {
     await map.create();
     await player.create();
 
+    const normalZombie = new NormalZombie();
+    this.app.stage.addChild(normalZombie);
+
     this.objectList = new Array();
 
     this.objectList.push(map);
     this.objectList.push(player);
+    this.objectList.push(normalZombie);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
