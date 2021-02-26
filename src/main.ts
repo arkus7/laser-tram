@@ -15,8 +15,8 @@ const postapo4MapSprites = [
   'assets/sprites/map/postapo4/bg.png',
   'assets/sprites/map/postapo4/rail&wall.png',
   'assets/sprites/map/postapo4/train.png',
-  'assets/sprites/map/postapo4/infopost&wires.png',
   'assets/sprites/map/postapo4/floor&underfloor.png',
+  'assets/sprites/map/postapo4/infopost&wires.png',
   'assets/sprites/map/postapo4/wires.png',
 ];
 export class Application {
