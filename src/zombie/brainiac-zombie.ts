@@ -3,6 +3,7 @@ import { ZombieType } from './zombie-enums';
 
 export class BrainiacZombie extends BaseZombie {
   public health = 50;
+  public score = 25;
 
   constructor() {
     super({

@@ -18,8 +18,8 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
 
   public health = 100;
   public maxHealth = 100;
-
   public damage = 5;
+  public totalScore = 0;
 
   private static readonly SPEED = 5;
   private static readonly VERTICAL_TELEPORT = 70;
@@ -119,6 +119,11 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
 
   public isAlive(): boolean {
     return this.health > 0;
+  }
+
+  public addToScore(score: number): number {
+    this.totalScore += score;
+    return this.totalScore;
   }
 
   public getDamage(): number {
