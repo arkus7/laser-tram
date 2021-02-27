@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js';
-import { HealthBar } from '../health-bar';
 
+import { HealthBar } from '../health-bar';
 import { SpriteObject } from '../interfaces/spriteObject';
 import { Weapon } from '../interfaces/weapon';
 import { Player } from '../player';
@@ -46,6 +46,8 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.anchor.x = 1;
 
     this.speed = 1;
+
+    this.addHealthBar(new HealthBar(this.width * -1, -20, 100, 100));
   }
 
   public isAlive(): boolean {
@@ -74,13 +76,16 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onUpdate(delta: number): void {
+    if (this._destroyed) {
+      return;
+    }
     if (this.needsAnimationUpdate) {
       this.changeAnimationTo(this.state);
       this.play();
       this.needsAnimationUpdate = false;
     }
 
-    if (this.x < 200) {
+    if (!this.isAlive()) {
       this.setState(ZombieState.Dead);
     }
 
@@ -90,13 +95,27 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
       } else {
         this.y += 1;
       }
+
+      if (!this.playing) {
+        this.fadeOut();
+      }
+
+      if (this.alpha < 0 && !this._destroyed) {
+        this.destroy({ children: true });
+      }
     }
 
-    this.x -= this.speed * delta;
+    if (!this._destroyed) {
+      this.x -= this.speed * delta;
+    }
   }
 
   private changeAnimationTo(state: ZombieState): void {
     this.textures = BaseZombie.texturesForType(this.type, state);
+  }
+
+  private fadeOut(): void {
+    this.alpha -= 0.05;
   }
 
   isCollisable(): boolean {
