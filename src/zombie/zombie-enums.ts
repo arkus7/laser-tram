@@ -10,4 +10,5 @@ export enum ZombieState {
   Hurt = 'hurt',
   Run = 'run',
   Walk = 'walk',
+  Jump = 'jump',
 }
