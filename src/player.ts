@@ -5,7 +5,7 @@ import { LivingBeing } from './interfaces/living-being';
 import { SpriteObject } from './interfaces/spriteObject';
 import { Weapon } from './interfaces/weapon';
 import { Keyboard } from './keyboard';
-import { Sound } from './sound';
+import { Sound } from './sounds/sound';
 import { BaseZombie } from './zombie/base-zombie';
 
 export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, Weapon {

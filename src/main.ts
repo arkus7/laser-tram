@@ -12,8 +12,9 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
-import { Sound } from './sound';
+import { Sound } from './sounds/sound';
 import { ZabaZombie } from './zombie/zaba-zombie';
+import { soundAssets } from './sounds/utils';
 
 const postapo4MapSprites = [
   'assets/sprites/map/postapo4/bg.png',
@@ -52,6 +53,7 @@ export class Application {
       .add(postapo4MapSprites)
       .add('assets/sprites/tram.png')
       .add('assets/sprites/map.jpg')
+      .add(soundAssets())
       .load(() => this.setup());
   }
 

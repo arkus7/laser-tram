@@ -4,7 +4,7 @@ import { HealthBar } from '../health-bar';
 import { SpriteObject } from '../interfaces/spriteObject';
 import { Weapon } from '../interfaces/weapon';
 import { Player } from '../player';
-import { Sound } from '../sound';
+import { Sound } from '../sounds/sound';
 import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
 
