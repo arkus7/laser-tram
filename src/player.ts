@@ -121,8 +121,11 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     return this.health > 0;
   }
 
-  public addToScore(score: number): number {
+  public addToScore(score: number): void {
     this.totalScore += score;
+  }
+
+  public getTotalScore(): number {
     return this.totalScore;
   }
 
