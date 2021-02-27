@@ -64,6 +64,8 @@ export class Application {
   private cheatKeysSequence: string[] = 'zelki'.split('');
   private keysSequence: string[] = [];
 
+  private backgroundMusic: Sound;
+
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
 
@@ -102,6 +104,9 @@ export class Application {
   };
 
   private async onClick(): Promise<void> {
+    if (!this.playScene.visible) {
+      return;
+    }
     const mouseposition = this.app.renderer.plugins.interaction.mouse.global;
     console.log(mouseposition.x);
     const projectile = new Projectile();
@@ -125,6 +130,8 @@ export class Application {
     this.app.stage.addChild(this.playScene);
     this.app.stage.addChild(this.upgradeScene);
     this.app.stage.addChild(this.gameOverScene);
+
+    this.backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
 
     this.setupPlayScene();
     this.setupUpgradeScene();
@@ -193,10 +200,7 @@ export class Application {
     startGameText.buttonMode = true;
 
     startGameText.on('pointertap', () => {
-      this.mainMenuScene.visible = false;
-      this.resetPlayScene();
-      this.playScene.visible = true;
-      this.appStage = this.play;
+      this.switchToPlayScene();
     });
 
     this.mainMenuScene.addChild(startGameText);
@@ -455,7 +459,6 @@ export class Application {
   }
 
   private setupPlayScene(): void {
-    const backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
     const parallaxMap = new ParallaxMap({
       renderer: this.app.renderer,
       assets: postapo4MapSprites,
@@ -483,14 +486,13 @@ export class Application {
     this.playScene.addChild(this.scoreCountText);
 
     this.player.onDeadEvent = () => {
-      backgroundMusic.get().stop();
+      this.backgroundMusic.get().stop();
       new Sound('assets/sounds/game_over.mp3', { volume: 4 }).get().play();
       this.switchToGameOver();
     };
 
     this.player.create();
     this.objectList.push(this.player);
-    backgroundMusic.get().play();
   }
 
   private switchToGameOver(): void {
@@ -523,6 +525,8 @@ export class Application {
     this.playScene.visible = true;
     this.upgradeScene.visible = false;
     this.gameOverScene.visible = false;
+    this.mainMenuScene.visible = false;
+    this.backgroundMusic.get().play();
     this.appStage = this.play;
   }
 
