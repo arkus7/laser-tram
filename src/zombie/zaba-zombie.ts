@@ -5,7 +5,13 @@ export class ZabaZombie extends BaseZombie {
   public health = 50;
 
   constructor() {
-    super({ type: ZombieType.Zaba });
+    super({
+      type: ZombieType.Zaba,
+      sounds: {
+        spawn: 'assets/sounds/zombie_zaba_spawn.mp3',
+        death: 'assets/sounds/zombie_zaba_dead.mp3',
+      },
+    });
   }
 
   public getDamage(): number {
