@@ -13,6 +13,9 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
+import { Sound } from './sounds/sound';
+import { ZabaZombie } from './zombie/zaba-zombie';
+import { soundAssets } from './sounds/utils';
 
 const postapo4MapSprites = [
   'assets/sprites/map/postapo4/bg.png',
@@ -46,14 +49,16 @@ export class Application {
     window.addEventListener('resize', () => this.resize());
     mainElement.appendChild(this.app.view);
     window.addEventListener('mousedown', () => this.onClick());
-  
+
     PIXI.Loader.shared
       .add(assetsForZombie(ZombieType.Normal))
       .add(assetsForZombie(ZombieType.Brainiac))
+      .add(assetsForZombie(ZombieType.Zaba))
       .add(postapo4MapSprites)
       .add('assets/sprites/tram.png')
       .add('assets/sprites/map.jpg')
       .add('assets/sprites/Vicodo_phone.png')
+      .add(soundAssets())
       .load(() => this.setup());
   }
 
@@ -62,28 +67,29 @@ export class Application {
     this.height = window.innerHeight;
 
     this.app.renderer.resize(this.width, this.height);
-     this.objectList.forEach((object) => {
+    this.objectList.forEach((object) => {
       object.onResize(this.width, this.height);
     });
   };
 
   private async onClick(): Promise<void> {
     const mouseposition = this.app.renderer.plugins.interaction.mouse.global;
-    console.log( mouseposition.x)
+    console.log(mouseposition.x);
     const projectile = new Projectile(this.app);
     let playerPos = this.player.getPosition();
     let dist_Y = mouseposition.y - playerPos.y;
     let dist_X = mouseposition.x - playerPos.x;
-    let angle = Math.atan2(dist_Y,dist_X);
+    let angle = Math.atan2(dist_Y, dist_X);
     await projectile.create(playerPos.x + this.player.width - 50, playerPos.y, mouseposition.x, mouseposition.y, angle);
     this.objectList.push(projectile);
-  };
-
+  }
 
   private async setup(): Promise<void> {
     this.player = new Player(this.app);
 
     this.player.onDeadEvent = () => {
+      backgroundMusic.get().stop();
+      new Sound('assets/sounds/game_over.mp3', { volume: 4 }).get().play();
       console.log('test', 'Player is dead');
     };
 
@@ -94,6 +100,8 @@ export class Application {
 
     this.app.stage.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
+
+    const backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
 
     await this.player.create();
     this.player.addHealthBar(new HealthBar(this.player.width / 8, -20, 100, 100));
@@ -110,25 +118,28 @@ export class Application {
     this.objectList.push(this.player);
     this.objectList.push(normalZombie, brainiacZombie);
 
+    backgroundMusic.get().play();
+
     this.app.ticker.add((delta) => this.gameLoop(delta));
-    
   }
 
   private gameLoop = (delta: number): void => {
     this.play(delta);
   };
 
- 
   private play = (delta: number): void => {
     Collisions.checkForCollisions(this.objectList.filter((obj) => !(obj as any)._destroyed));
 
     if (Math.ceil(Math.random() * 200) % 100 == 0) {
       let zombie: BaseZombie;
-      if (Math.ceil(Math.random() * 3) % 2 == 0) {
+      if (Math.ceil(Math.random() * 3) % 3 == 0) {
         zombie = new NormalZombie();
-      } else {
+      } else if (Math.ceil(Math.random() * 3) % 3 == 1) {
         zombie = new BrainiacZombie();
+      } else {
+        zombie = new ZabaZombie();
       }
+
       zombie.x = Math.random() * 600 + this.app.screen.width;
       zombie.y = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
       this.objectList.push(zombie);
@@ -139,7 +150,6 @@ export class Application {
       object.onUpdate(delta);
     });
   };
- 
 }
 
 const app = new Application();
