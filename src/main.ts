@@ -3,10 +3,6 @@ import '../styles.scss';
 import * as PIXI from 'pixi.js';
 import { Map } from './map';
 import { Projectile } from './projectile';
-
-let objectList = new Array();
-let bulletsList = new Array();
-
 import { Collisions } from './collisions';
 import { HealthBar } from './health-bar';
 import { SpriteObject } from './interfaces/spriteObject';
@@ -65,7 +61,7 @@ export class Application {
     this.height = window.innerHeight;
 
     this.app.renderer.resize(this.width, this.height);
-      objectList.forEach((object) => {
+     this.objectList.forEach((object) => {
       object.onResize(this.width, this.height);
     });
   };
@@ -73,7 +69,6 @@ export class Application {
   private async onClick(): Promise<void> {
     const mouseposition = this.app.renderer.plugins.interaction.mouse.global;
     console.log( mouseposition.x)
-    this.app.loader.reset();
     const projectile = new Projectile(this.app);
     let playerPos = this.player.getPosition();
     let dist_Y = mouseposition.y - playerPos.y;
