@@ -2,7 +2,8 @@
   "name": "pixijs-tutorial",
   "version": "0.0.1",
   "scripts": {
-    "start": "webpack-dev-server -d"
+    "start": "webpack-dev-server -d",
+    "start:heroku": "webpack-dev-server --port $PORT"
   },
   "license": "MIT",
   "dependencies": {
