@@ -12,6 +12,7 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
+import { ZabaZombie } from './zombie/zaba-zombie';
 
 const postapo4MapSprites = [
   'assets/sprites/map/postapo4/bg.png',
@@ -46,6 +47,7 @@ export class Application {
     PIXI.Loader.shared
       .add(assetsForZombie(ZombieType.Normal))
       .add(assetsForZombie(ZombieType.Brainiac))
+      .add(assetsForZombie(ZombieType.Zaba))
       .add(postapo4MapSprites)
       .add('assets/sprites/tram.png')
       .add('assets/sprites/map.jpg')
@@ -105,11 +107,14 @@ export class Application {
 
     if (Math.ceil(Math.random() * 200) % 100 == 0) {
       let zombie: BaseZombie;
-      if (Math.ceil(Math.random() * 3) % 2 == 0) {
+      if (Math.ceil(Math.random() * 3) % 3 == 0) {
         zombie = new NormalZombie();
-      } else {
+      } else if (Math.ceil(Math.random() * 3) % 3 == 1) {
         zombie = new BrainiacZombie();
+      } else {
+        zombie = new ZabaZombie();
       }
+
       zombie.x = Math.random() * 600 + this.app.screen.width;
       zombie.y = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
       this.objectList.push(zombie);
