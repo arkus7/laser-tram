@@ -93,6 +93,46 @@ export class Application {
     this.app.stage.addChild(this.gameScene);
     this.app.stage.addChild(this.gameOverScene);
 
+    this.setupPlayScene();
+
+    this.appStage = this.play;
+
+    this.app.ticker.add((delta) => this.gameLoop(delta));
+  }
+
+  private gameLoop = (delta: number): void => {
+    this.appStage(delta);
+  };
+
+  private play = (delta: number): void => {
+    Collisions.checkForCollisions(this.objectList.filter((obj) => !(obj as any)._destroyed));
+
+    if (Math.ceil(Math.random() * 200) % 100 == 0) {
+      let zombie: BaseZombie;
+      if (Math.ceil(Math.random() * 3) % 2 == 0) {
+        zombie = new NormalZombie();
+      } else {
+        zombie = new BrainiacZombie();
+      }
+      zombie.x = Math.random() * 600 + this.app.screen.width;
+      const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
+      zombie.y = Math.min(randomY, this.gameScene.height - zombie.height);
+      this.objectList.push(zombie);
+      this.gameScene.addChild(zombie);
+    }
+
+    this.objectList.forEach((object) => {
+      if (isDestroyed(object)) {
+        return;
+      }
+      object.onUpdate(delta);
+      this.destroyObjectWhenOutOfBounds(object);
+    });
+  };
+
+  private gameOver = (): void => {};
+
+  private setupPlayScene() {
     const parallaxMap = new ParallaxMap({
       renderer: this.app.renderer,
       assets: postapo4MapSprites,
@@ -122,57 +162,25 @@ export class Application {
 
     this.objectList.push(this.player);
     this.objectList.push(normalZombie, brainiacZombie);
-
-    this.appStage = this.play;
-
-    this.app.ticker.add((delta) => this.gameLoop(delta));
   }
-
-  private gameLoop = (delta: number): void => {
-    // console.log(this.gameScene.getBounds(true));
-    this.appStage(delta);
-  };
-
-  private play = (delta: number): void => {
-    Collisions.checkForCollisions(this.objectList.filter((obj) => !(obj as any)._destroyed));
-
-    if (Math.ceil(Math.random() * 200) % 100 == 0) {
-      let zombie: BaseZombie;
-      if (Math.ceil(Math.random() * 3) % 2 == 0) {
-        zombie = new NormalZombie();
-      } else {
-        zombie = new BrainiacZombie();
-      }
-      zombie.x = Math.random() * 600 + this.app.screen.width;
-      const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
-      zombie.y = Math.min(randomY, this.gameScene.height - zombie.height);
-      this.objectList.push(zombie);
-      this.gameScene.addChild(zombie);
-    }
-
-    this.objectList.forEach((object) => {
-      if (isDestroyed(object)) {
-        return;
-      }
-      object.onUpdate(delta);
-      if (
-        !isDestroyed(object) &&
-        (object.x > this.gameScene.width + 3 * object.width || object.y > this.gameScene.height + 3 * object.height)
-      ) {
-        object.destroy({ children: true });
-      }
-    });
-  };
-
-  private gameOver = (): void => {};
 
   private swithToGameOver(): void {
     this.gameScene.visible = false;
     this.appStage = this.gameOver;
   }
+
+  private destroyObjectWhenOutOfBounds(object: PIXI.Container) {
+    if (
+      !isDestroyed(object) &&
+      (object.x > this.gameScene.width + 3 * object.width || object.y > this.gameScene.height + 3 * object.height)
+    ) {
+      object.destroy({ children: true });
+    }
+  }
+}
+
+export function isDestroyed(object: PIXI.DisplayObject) {
+  return (object as any)._destroyed;
 }
 
 const app = new Application();
-function isDestroyed(object: SpriteObject & PIXI.Container) {
-  return (object as any)._destroyed;
-}
