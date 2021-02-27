@@ -1,18 +1,14 @@
-import * as PIXI from 'pixi.js';
 import PIXISound from 'pixi-sound';
 
 export class Sound {
   private sound: PIXISound.Sound;
 
-  constructor(asset: string) {
+  constructor(asset: string, options?: PIXISound.Options) {
     this.sound = PIXISound.Sound.from(asset);
-
-    // this.sound = PIXI.Loader.shared.resources[asset].sound;
+    this.sound.speed = options?.speed;
   }
 
   public play() {
     this.sound.play();
-    this.sound.speed = 3;
-    this.sound.loop = true;
   }
 }

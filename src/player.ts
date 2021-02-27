@@ -24,12 +24,16 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
 
   public onDeadEvent: Function;
 
-  private startSound: Sound;
+  private changeTracksSound: Sound;
 
   constructor(app) {
     super(PIXI.Loader.shared.resources['assets/sprites/tram.png'].texture);
     this.app = app;
-    this.startSound = new Sound('assets/sounds/tram-select.mp3');
+    this.initSounds();
+  }
+
+  private initSounds() {
+    this.changeTracksSound = new Sound('assets/sounds/tram-select.mp3', { speed: 0.5 });
   }
 
   public async create(): Promise<void> {
@@ -85,8 +89,6 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     };
 
     up.press = (): void => {
-      this.startSound.play();
-
       if (
         this.y - Player.VERTICAL_TELEPORT >=
         this.app.renderer.screen.height -
@@ -95,6 +97,7 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
           Player.VERTICAL_TELEPORT * (Player.NUM_OF_TRACKS - 1)
       ) {
         this.y -= Player.VERTICAL_TELEPORT;
+        this.changeTracksSound.play();
       }
     };
 
@@ -104,6 +107,7 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
         this.app.renderer.screen.height - this.height - Player.START_TRACK_RELATIVE_POSITION_Y
       ) {
         this.y += Player.VERTICAL_TELEPORT;
+        this.changeTracksSound.play();
       }
     };
   }
