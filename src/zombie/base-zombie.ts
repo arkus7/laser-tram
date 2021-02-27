@@ -1,10 +1,8 @@
-import { AdjustmentFilter } from 'pixi-filters';
 import * as PIXI from 'pixi.js';
 
 import { HealthBar } from '../health-bar';
 import { SpriteObject } from '../interfaces/spriteObject';
 import { Weapon } from '../interfaces/weapon';
-import { isDestroyed } from '../main';
 import { Player } from '../player';
 import { Sound } from '../sounds/sound';
 import { assetsForZombie, spritesPerZombieState } from './utils';
@@ -24,7 +22,7 @@ export type ZombieConstructorParams = {
 export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject, Weapon {
   public speed: number;
   public health: number;
-
+  public score: number;
   protected spawnSound: Sound;
   protected deathSound: Sound;
 
@@ -66,8 +64,6 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
 
     this.speed = 1;
 
-    this.filters = [new AdjustmentFilter({ red: 1.3, green: 1.3, saturation: 0.5 })];
-
     this.addHealthBar(new HealthBar(this.width * -1, -20, 100, 100));
 
     this.spawnSound.get().play();
@@ -99,11 +95,9 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onUpdate(delta: number): void {
-    if (isDestroyed(this)) {
+    if (this._destroyed) {
       return;
     }
-    this.x -= this.speed * delta;
-
     if (this.needsAnimationUpdate) {
       this.changeAnimationTo(this.state);
       this.play();
@@ -125,10 +119,18 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
         this.fadeOut();
       }
 
-      if (this.alpha < 0 && !isDestroyed(this)) {
+      if (this.alpha < 0 && !this._destroyed) {
         this.destroy({ children: true });
       }
     }
+
+    if (!this._destroyed) {
+      this.x -= this.speed * delta;
+    }
+  }
+
+  public getScore(): number {
+    return this.score;
   }
 
   private changeAnimationTo(state: ZombieState): void {
@@ -154,6 +156,7 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
       this.healthBar?.onChangeHP(this.health);
       }
       if (!this.isAlive()) {
+       
         if (this.deathSound.get().isPlaying === false) {
           this.deathSound.get().play();
 
