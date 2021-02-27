@@ -15,7 +15,7 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZabaZombie } from './zombie/zaba-zombie';
-import { ZombieType } from './zombie/zombie-enums';
+import { ZombieState, ZombieType } from './zombie/zombie-enums';
 
 const postapo4MapSprites = [
   'assets/sprites/map/postapo4/bg.png',
@@ -58,6 +58,9 @@ export class Application {
   private upgradeScene: PIXI.Container;
   private gameOverScene: PIXI.Container;
   private mainMenuScene: PIXI.Container;
+
+  private mainMenuTram: PIXI.Sprite;
+  private mainMenuZombies: BaseZombie[];
 
   private objectList: Array<SpriteObject & PIXI.Container> = new Array();
 
@@ -149,6 +152,33 @@ export class Application {
 
   private setupMainMenuScene() {
     this.playScene.visible = false;
+
+    this.mainMenuTram = new PIXI.Sprite(PIXI.Loader.shared.resources['assets/sprites/tram.png'].texture);
+    // this.mainMenuScene.addChild(this.mainMenuTram);
+
+    this.mainMenuZombies = [
+      new NormalZombie(),
+      new BrainiacZombie(),
+      new ZabaZombie(),
+      new NormalZombie(),
+      new BrainiacZombie(),
+      new ZabaZombie(),
+      new BrainiacZombie(),
+      new NormalZombie(),
+    ].map((z, i) => {
+      z.removeChild(...z.children);
+      const randomSign = Math.ceil(Math.random() * 2) % 2 == 0 ? 1 : -1;
+      z.scale.set(randomSign * 0.5, 0.5);
+      z.speed = 0;
+      z.x = Math.random() * 400 + (i < 4 ? 100 : 1300);
+      z.y = (z.height + 50) * (i < 4 ? i : i - 4) + z.height + 50;
+      z.setState(ZombieState.Jump);
+      z.anchor.set(0.5, 0.5);
+      return z;
+    });
+    this.mainMenuZombies.map((z) => z.removeChild(...z.children));
+    this.mainMenuScene.addChild(...this.mainMenuZombies);
+
     const titleStyle = new PIXI.TextStyle({
       fontFamily: 'Futura',
       align: 'center',
@@ -326,8 +356,13 @@ export class Application {
     this.gameOverCounter += 1;
   };
 
-  private mainMenu = (): void => {
-    //
+  private mainMenu = (delta): void => {
+    this.mainMenuZombies.forEach((zombie) => {
+      zombie.onUpdate(delta);
+      if (zombie.x < 0 - zombie.width || zombie.x > APP_WIDTH + zombie.width) {
+        zombie.x = zombie.speed < 0 ? 0 : APP_WIDTH;
+      }
+    });
   };
 
   private setupUpgradeScene(): void {
