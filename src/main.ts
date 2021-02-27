@@ -41,11 +41,11 @@ export class Application {
   private playerDamage = 5;
   private playerMaxHealth = 100;
   private healthUpgradeCost = 0;
-  private weaponDamageUpgradeCost = 0;
+  private ramDamageUpgradeCost = 0;
 
   private playerPointsText: PIXI.Text;
   private currentHealthText: PIXI.Text;
-  private currentWeaponDamageText: PIXI.Text;
+  private upgradeRamDamageCostText: PIXI.Text;
 
   private appStage: (delta?: number) => void;
 
@@ -248,19 +248,19 @@ export class Application {
     this.currentHealthText.x = APP_WIDTH - upgradeHealthButton.width - 100 - 100;
     this.currentHealthText.y = 200;
 
-    const upgradeWeaponDamageText = new PIXI.Text('Upgrade weapon damage', upgradeMenuTextStyle);
-    upgradeWeaponDamageText.x = 50;
-    upgradeWeaponDamageText.y = 300;
+    const upgradeRamDamageText = new PIXI.Text('Upgrade ram damage', upgradeMenuTextStyle);
+    upgradeRamDamageText.x = 50;
+    upgradeRamDamageText.y = 300;
 
-    const upgradeWeaponDamageButton = new PIXI.Text('+', upgradeMenuTextStyle);
-    upgradeWeaponDamageButton.x = APP_WIDTH - 100;
-    upgradeWeaponDamageButton.y = 300;
-    upgradeWeaponDamageButton.interactive = true;
-    upgradeWeaponDamageButton.buttonMode = true;
+    const upgradeRamDamageButton = new PIXI.Text('+', upgradeMenuTextStyle);
+    upgradeRamDamageButton.x = APP_WIDTH - 100;
+    upgradeRamDamageButton.y = 300;
+    upgradeRamDamageButton.interactive = true;
+    upgradeRamDamageButton.buttonMode = true;
 
-    this.currentWeaponDamageText = new PIXI.Text(this.weaponDamageUpgradeCost.toString(), upgradeMenuTextStyle);
-    this.currentWeaponDamageText.x = APP_WIDTH - upgradeWeaponDamageButton.width - 100 - 100;
-    this.currentWeaponDamageText.y = 300;
+    this.upgradeRamDamageCostText = new PIXI.Text(this.ramDamageUpgradeCost.toString(), upgradeMenuTextStyle);
+    this.upgradeRamDamageCostText.x = APP_WIDTH - upgradeRamDamageButton.width - 100 - 100;
+    this.upgradeRamDamageCostText.y = 300;
 
     const restartGameText = new PIXI.Text('Restart Game', { ...upgradeMenuTextStyle, fontSize: 120 });
     restartGameText.x = APP_WIDTH / 2 - restartGameText.width / 2;
@@ -278,12 +278,12 @@ export class Application {
       }
     });
 
-    upgradeWeaponDamageButton.on('pointertap', () => {
-      if (this.playerPoints >= this.weaponDamageUpgradeCost) {
+    upgradeRamDamageButton.on('pointertap', () => {
+      if (this.playerPoints >= this.ramDamageUpgradeCost) {
         this.playerDamage += 10;
-        this.playerPoints -= this.weaponDamageUpgradeCost;
-        this.weaponDamageUpgradeCost = this.playerDamage * 5;
-        this.currentWeaponDamageText.text = this.weaponDamageUpgradeCost.toString();
+        this.playerPoints -= this.ramDamageUpgradeCost;
+        this.ramDamageUpgradeCost = this.playerDamage * 5;
+        this.upgradeRamDamageCostText.text = this.ramDamageUpgradeCost.toString();
         this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
       }
     });
@@ -296,9 +296,9 @@ export class Application {
     this.upgradeScene.addChild(upgradeHealthText);
     this.upgradeScene.addChild(upgradeHealthButton);
     this.upgradeScene.addChild(this.currentHealthText);
-    this.upgradeScene.addChild(upgradeWeaponDamageText);
-    this.upgradeScene.addChild(upgradeWeaponDamageButton);
-    this.upgradeScene.addChild(this.currentWeaponDamageText);
+    this.upgradeScene.addChild(upgradeRamDamageText);
+    this.upgradeScene.addChild(upgradeRamDamageButton);
+    this.upgradeScene.addChild(this.upgradeRamDamageCostText);
     this.upgradeScene.addChild(restartGameText);
   }
 
@@ -355,11 +355,11 @@ export class Application {
 
     this.playerPoints = this.player.getTotalScore();
     this.healthUpgradeCost = this.player.getMaxHealth() * 5;
-    this.weaponDamageUpgradeCost = this.player.getDamage() * 5;
+    this.ramDamageUpgradeCost = this.player.getDamage() * 5;
 
     this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
     this.currentHealthText.text = this.healthUpgradeCost.toString();
-    this.currentWeaponDamageText.text = this.weaponDamageUpgradeCost.toString();
+    this.upgradeRamDamageCostText.text = this.ramDamageUpgradeCost.toString();
 
     this.appStage = this.upgrade;
   }
