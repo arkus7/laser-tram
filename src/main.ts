@@ -57,6 +57,7 @@ export class Application {
   private playScene: PIXI.Container;
   private upgradeScene: PIXI.Container;
   private gameOverScene: PIXI.Container;
+  private mainMenuScene: PIXI.Container;
 
   private objectList: Array<SpriteObject & PIXI.Container> = new Array();
 
@@ -86,6 +87,7 @@ export class Application {
       .add('assets/sprites/map.jpg')
       .add('assets/sprites/Vicodo_phone.png')
       .add(soundAssets())
+      .add('assets/fonts/zoombieland.ttf')
       .load(() => this.setup());
   }
 
@@ -117,7 +119,9 @@ export class Application {
     this.playScene = new PIXI.Container();
     this.upgradeScene = new PIXI.Container();
     this.gameOverScene = new PIXI.Container();
+    this.mainMenuScene = new PIXI.Container();
 
+    this.app.stage.addChild(this.mainMenuScene);
     this.app.stage.addChild(this.playScene);
     this.app.stage.addChild(this.upgradeScene);
     this.app.stage.addChild(this.gameOverScene);
@@ -125,12 +129,77 @@ export class Application {
     this.setupPlayScene();
     this.setupUpgradeScene();
     this.setupGameOverScene();
+    this.setupMainMenuScene();
 
     this.setupCheats();
 
-    this.appStage = this.play;
+    this.appStage = this.mainMenu;
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
+  }
+
+  private setupMainMenuScene() {
+    this.playScene.visible = false;
+    const titleStyle = new PIXI.TextStyle({
+      fontFamily: 'Futura',
+      align: 'center',
+      dropShadow: true,
+      dropShadowBlur: 5,
+      dropShadowColor: '#cccccc',
+      fill: 'yellow',
+      fontSize: 60,
+      wordWrap: true,
+      wordWrapWidth: 700,
+    });
+    const titleText = new PIXI.Text(`Jeżdżący tramwaj strzelający laserami do`, titleStyle);
+    titleText.y = 200;
+    titleText.x = APP_WIDTH / 2 - titleText.width / 2;
+
+    const titleStrikethroughText = new PIXI.Text(`ludzi zarażonych covidem`, { ...titleStyle, wordWrap: false });
+    titleStrikethroughText.y = titleText.y + titleText.height;
+    titleStrikethroughText.x = (APP_WIDTH - titleStrikethroughText.width) / 2;
+
+    this.mainMenuScene.addChild(titleText);
+    this.mainMenuScene.addChild(titleStrikethroughText);
+
+    const strikethrough = new PIXI.Graphics();
+    strikethrough.beginFill(0xc80000);
+    strikethrough.drawRect(
+      titleStrikethroughText.x - 50,
+      titleStrikethroughText.y + titleStrikethroughText.height / 2,
+      titleStrikethroughText.width + 100,
+      titleStrikethroughText.height / 10
+    );
+    strikethrough.endFill();
+
+    this.mainMenuScene.addChild(strikethrough);
+
+    const zombieText = new PIXI.Text(`ZOMBIE`, {
+      ...titleStyle,
+      fontSize: 120,
+      fill: 'yellow',
+      fontFamily: 'zoombieland demo',
+    });
+    zombieText.x = (APP_WIDTH - zombieText.width) / 2;
+    zombieText.y = titleStrikethroughText.y + titleStrikethroughText.height + 10;
+
+    this.mainMenuScene.addChild(zombieText);
+
+    const startGameText = new PIXI.Text('Start Game', { ...titleStyle, fill: 'white' });
+    startGameText.x = (APP_WIDTH - startGameText.width) / 2;
+    startGameText.y = APP_HEIGHT - startGameText.height - 200;
+
+    startGameText.interactive = true;
+    startGameText.buttonMode = true;
+
+    startGameText.on('pointertap', () => {
+      this.mainMenuScene.visible = false;
+      this.resetPlayScene();
+      this.playScene.visible = true;
+      this.appStage = this.play;
+    });
+
+    this.mainMenuScene.addChild(startGameText);
   }
 
   private setupCheats() {
@@ -246,6 +315,10 @@ export class Application {
       ];
     }
     this.gameOverCounter += 1;
+  };
+
+  private mainMenu = (): void => {
+    //
   };
 
   private setupUpgradeScene(): void {
