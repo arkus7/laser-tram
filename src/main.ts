@@ -159,8 +159,7 @@ export class Application {
         zombie = new ZabaZombie();
       }
       zombie.onDeadEvent = () => {
-           let text=  this.player.addToScore(zombie.score);
-           
+          let text=  this.player.addToScore(zombie.score);
           this.scoreCount.text = text.toString();
          };
       zombie.x = Math.random() * 600 + this.app.screen.width;
@@ -203,7 +202,7 @@ export class Application {
       assets: postapo4MapSprites,
     });
 
-    // parallaxMap.children[0].filters = [new GodrayFilter()];
+    parallaxMap.children[0].filters = [new GodrayFilter()];
 
     this.playScene.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
@@ -216,7 +215,7 @@ export class Application {
       fontSize: 120,
       fill: 'white',
     });
-    this.scoreCount= new PIXI.Text('', scoreStyle);
+    this.scoreCount= new PIXI.Text('0', scoreStyle);
     this.scoreCount.x= 100;
     this.scoreCount.y = 100;
     this.playScene.addChild(this.scoreCount);
