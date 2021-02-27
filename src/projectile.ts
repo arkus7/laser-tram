@@ -27,6 +27,7 @@ export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon {
   onCollision?(object: SpriteObject): void {
     if (object instanceof BaseZombie) {
       this.alpha = 0;
+      this.destroy();
     }
   }
 
