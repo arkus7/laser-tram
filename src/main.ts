@@ -192,7 +192,8 @@ export class Application {
       renderer: this.app.renderer,
       assets: postapo4MapSprites,
     });
-    parallaxMap.filters = [new GodrayFilter()];
+
+    parallaxMap.children[0].filters = [new GodrayFilter()];
 
     this.playScene.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
