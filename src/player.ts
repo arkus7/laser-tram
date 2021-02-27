@@ -18,8 +18,8 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
 
   public health = 100;
   public maxHealth = 100;
-  public damage = 5;
   public totalScore = 0;
+  private damage = 5;
 
   private static readonly SPEED = 5;
   private static readonly VERTICAL_TELEPORT = 70;
@@ -71,6 +71,10 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     const right = new Keyboard('ArrowRight');
     const up = new Keyboard('ArrowUp');
     const down = new Keyboard('ArrowDown');
+    const w = new Keyboard('w');
+    const s = new Keyboard('s');
+    const a = new Keyboard('a');
+    const d = new Keyboard('d');
 
     left.press = (): void => {
       this.vx = -Player.SPEED;
@@ -111,6 +115,15 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
         this.changeTracksSound.get().play();
       }
     };
+
+    w.press = up.press;
+    w.release = up.release;
+    s.press = down.press;
+    s.release = down.release;
+    a.press = left.press;
+    a.release = left.release;
+    d.press = right.press;
+    d.release = right.release;
   }
 
   public isCollisable(): boolean {
