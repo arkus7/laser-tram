@@ -7,6 +7,7 @@ import { Player } from '../player';
 import { Sound } from '../sounds/sound';
 import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
+import { Projectile } from '../projectile';
 
 export type ZombieConstructorParams = {
   type: ZombieType;
@@ -145,10 +146,11 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onCollision(object: SpriteObject): void {
-    if (object instanceof Player) {
+    if (object instanceof Player  || object instanceof Projectile) {
+      if(object.getDamage() != 0){
       this.health -= object.getDamage();
       this.healthBar?.onChangeHP(this.health);
-
+      }
       if (!this.isAlive()) {
         if (this.deathSound.get().isPlaying === false) {
           this.deathSound.get().play();
