@@ -34,7 +34,7 @@ export class Application {
 
   private appStage: (delta?: number) => void;
 
-  private gameScene: PIXI.Container;
+  private playScene: PIXI.Container;
   private gameOverScene: PIXI.Container;
 
   private objectList: Array<SpriteObject & PIXI.Container> = new Array();
@@ -82,22 +82,52 @@ export class Application {
     let dist_X = mouseposition.x - playerPos.x;
     let angle = Math.atan2(dist_Y, dist_X);
     projectile.create(playerPos.x + this.player.width - 50, playerPos.y, mouseposition.x, mouseposition.y, angle);
-    this.gameScene.addChild(projectile);
+    this.playScene.addChild(projectile);
     this.objectList.push(projectile);
   }
 
   private async setup(): Promise<void> {
-    this.gameScene = new PIXI.Container();
+    this.playScene = new PIXI.Container();
     this.gameOverScene = new PIXI.Container();
 
-    this.app.stage.addChild(this.gameScene);
+    this.app.stage.addChild(this.playScene);
     this.app.stage.addChild(this.gameOverScene);
 
     this.setupPlayScene();
+    this.setupGameOverScene();
 
     this.appStage = this.play;
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
+  }
+
+  private setupGameOverScene(): void {
+    this.gameOverScene.visible = false;
+    const gameOverTextStyle = new PIXI.TextStyle({
+      fontFamily: 'Futura',
+      fontSize: 120,
+      fill: 'white',
+    });
+
+    const gameOverText = new PIXI.Text('Game Over', gameOverTextStyle);
+    gameOverText.x = APP_WIDTH / 2 - gameOverText.width / 2;
+    gameOverText.y = 100;
+
+    const restartGameText = new PIXI.Text('Restart Game', { ...gameOverTextStyle, fontSize: 64 });
+    restartGameText.x = APP_WIDTH / 2 - restartGameText.width / 2;
+    restartGameText.y = APP_HEIGHT - restartGameText.height - 100;
+    restartGameText.interactive = true;
+    restartGameText.buttonMode = true;
+
+    restartGameText.on('pointertap', () => {
+      this.swithToPlayScene();
+    });
+
+    const tram = new PIXI.Sprite(PIXI.Loader.shared.resources['assets/sprites/map/postapo4/train.png'].texture);
+
+    this.gameOverScene.addChild(tram);
+    this.gameOverScene.addChild(gameOverText);
+    this.gameOverScene.addChild(restartGameText);
   }
 
   private gameLoop = (delta: number): void => {
@@ -105,7 +135,7 @@ export class Application {
   };
 
   private play = (delta: number): void => {
-    Collisions.checkForCollisions(this.objectList.filter((obj) => !(obj as any)._destroyed));
+    Collisions.checkForCollisions(this.objectList);
 
     if (Math.ceil(Math.random() * 200) % 100 == 0) {
       let zombie: BaseZombie;
@@ -116,9 +146,9 @@ export class Application {
       }
       zombie.x = Math.random() * 600 + this.app.screen.width;
       const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
-      zombie.y = Math.min(randomY, this.gameScene.height - zombie.height);
+      zombie.y = Math.min(randomY, this.playScene.height - zombie.height);
       this.objectList.push(zombie);
-      this.gameScene.addChild(zombie);
+      this.playScene.addChild(zombie);
     }
 
     this.objectList.forEach((object) => {
@@ -138,41 +168,55 @@ export class Application {
       assets: postapo4MapSprites,
     });
 
-    this.gameScene.addChild(parallaxMap);
+    this.playScene.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
 
     this.player = new Player();
-    this.gameScene.addChild(this.player);
+    this.playScene.addChild(this.player);
 
     this.player.onDeadEvent = () => {
       console.log('test', 'Player is dead');
-      // this.swithToGameOver();
+      this.swithToGameOver();
     };
 
     this.player.create();
 
     const normalZombie = new NormalZombie();
-    this.gameScene.addChild(normalZombie);
+    this.playScene.addChild(normalZombie);
 
     const brainiacZombie = new BrainiacZombie();
     brainiacZombie.x = 1550;
     brainiacZombie.y = 850;
 
-    this.gameScene.addChild(brainiacZombie);
+    this.playScene.addChild(brainiacZombie);
 
     this.objectList.push(this.player);
     this.objectList.push(normalZombie, brainiacZombie);
   }
 
   private swithToGameOver(): void {
-    this.gameScene.visible = false;
+    this.playScene.visible = false;
+    this.gameOverScene.visible = true;
     this.appStage = this.gameOver;
+  }
+
+  private swithToPlayScene(): void {
+    this.resetPlayScene();
+    this.playScene.visible = true;
+    this.gameOverScene.visible = false;
+    this.appStage = this.play;
+  }
+
+  private resetPlayScene(): void {
+    this.playScene.removeChild(...this.playScene.children);
+    this.objectList.length = 0;
+    this.setupPlayScene();
   }
 
   private destroyObjectWhenOutOfBounds(object: PIXI.Container) {
     if (
       !isDestroyed(object) &&
-      (object.x > this.gameScene.width + 3 * object.width || object.y > this.gameScene.height + 3 * object.height)
+      (object.x > this.playScene.width + 3 * object.width || object.y > this.playScene.height + 3 * object.height)
     ) {
       object.destroy({ children: true });
     }
