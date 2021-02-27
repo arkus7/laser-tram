@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import { HealthBar } from '../health-bar';
 import { SpriteObject } from '../interfaces/spriteObject';
 import { Weapon } from '../interfaces/weapon';
+import { isDestroyed } from '../main';
 import { Player } from '../player';
 import { Sound } from '../sounds/sound';
 import { assetsForZombie, spritesPerZombieState } from './utils';
@@ -95,9 +96,11 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onUpdate(delta: number): void {
-    if (this._destroyed) {
+    if (isDestroyed(this)) {
       return;
     }
+    this.x -= this.speed * delta;
+
     if (this.needsAnimationUpdate) {
       this.changeAnimationTo(this.state);
       this.play();
@@ -119,13 +122,9 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
         this.fadeOut();
       }
 
-      if (this.alpha < 0 && !this._destroyed) {
+      if (this.alpha < 0 && !isDestroyed(this)) {
         this.destroy({ children: true });
       }
-    }
-
-    if (!this._destroyed) {
-      this.x -= this.speed * delta;
     }
   }
 
