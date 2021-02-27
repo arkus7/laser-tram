@@ -105,15 +105,25 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
           Player.VERTICAL_TELEPORT * (Player.NUM_OF_TRACKS - 1)
       ) {
         this.y -= Player.VERTICAL_TELEPORT;
+        this.angle = -2;
         this.changeTracksSound.get().play();
       }
+    };
+
+    up.release = (): void => {
+      this.angle = 0;
     };
 
     down.press = (): void => {
       if (this.y + Player.VERTICAL_TELEPORT <= APP_HEIGHT - this.height - Player.START_TRACK_RELATIVE_POSITION_Y) {
         this.y += Player.VERTICAL_TELEPORT;
+        this.angle = 2;
         this.changeTracksSound.get().play();
       }
+    };
+
+    down.release = (): void => {
+      this.angle = 0;
     };
 
     w.press = up.press;
@@ -165,6 +175,8 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
   public onUpdate = (delta: number): void => {
     this.x += this.vx;
     this.y += this.vy;
+    // nice wiggling
+    this.pivot.y = Math.cos(Math.random() * 2);
   };
 
   public onResize = (width: number, height: number): void => {
