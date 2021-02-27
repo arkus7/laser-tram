@@ -1,3 +1,4 @@
+import { AdjustmentFilter } from 'pixi-filters';
 import * as PIXI from 'pixi.js';
 
 import { HealthBar } from './health-bar';
@@ -44,6 +45,9 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     this.vy = 0;
 
     this.setKeyboardEvents();
+
+    this.filters = [new AdjustmentFilter({ red: 1.3, green: 1.3 })];
+
     this.addHealthBar(new HealthBar(this.width / 8, -20, 100, 100));
   }
 

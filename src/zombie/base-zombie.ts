@@ -1,3 +1,4 @@
+import { AdjustmentFilter } from 'pixi-filters';
 import * as PIXI from 'pixi.js';
 
 import { HealthBar } from '../health-bar';
@@ -64,6 +65,8 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.anchor.x = 1;
 
     this.speed = 1;
+
+    this.filters = [new AdjustmentFilter({ red: 1.3, green: 1.3, saturation: 0.5 })];
 
     this.addHealthBar(new HealthBar(this.width * -1, -20, 100, 100));
 
