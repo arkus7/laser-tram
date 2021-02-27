@@ -35,7 +35,7 @@ export class Application {
   private width = APP_WIDTH;
   private height = APP_HEIGHT;
   private player: Player;
-
+  private scoreCount;
   private gameOverCounter = 0;
 
   private appStage: (delta?: number) => void;
@@ -100,7 +100,7 @@ export class Application {
 
     this.app.stage.addChild(this.playScene);
     this.app.stage.addChild(this.gameOverScene);
-
+    
     this.setupPlayScene();
     this.setupGameOverScene();
 
@@ -145,9 +145,12 @@ export class Application {
 
   private play = (delta: number): void => {
     Collisions.checkForCollisions(this.objectList);
+   
+   
 
     if (Math.ceil(Math.random() * 200) % 100 == 0) {
       let zombie: BaseZombie;
+      
       if (Math.ceil(Math.random() * 3) % 3 == 0) {
         zombie = new NormalZombie();
       } else if (Math.ceil(Math.random() * 3) % 3 == 1) {
@@ -155,18 +158,24 @@ export class Application {
       } else {
         zombie = new ZabaZombie();
       }
-
+      zombie.onDeadEvent = () => {
+          let text=  this.player.addToScore(zombie.score);
+          this.scoreCount.text = text.toString();
+         };
       zombie.x = Math.random() * 600 + this.app.screen.width;
       const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
       zombie.y = Math.min(randomY, this.playScene.height - zombie.height);
+   
       this.objectList.push(zombie);
       this.playScene.addChild(zombie);
+      
     }
-
+   
     this.objectList.forEach((object) => {
       if (isDestroyed(object)) {
         return;
       }
+      
       object.onUpdate(delta);
       this.destroyObjectWhenOutOfBounds(object);
     });
@@ -201,26 +210,24 @@ export class Application {
     this.player = new Player();
     this.playScene.addChild(this.player);
 
+    const scoreStyle = new PIXI.TextStyle({
+      fontFamily: 'Futura',
+      fontSize: 120,
+      fill: 'white',
+    });
+    this.scoreCount= new PIXI.Text('0', scoreStyle);
+    this.scoreCount.x= 100;
+    this.scoreCount.y = 100;
+    this.playScene.addChild(this.scoreCount);
+
     this.player.onDeadEvent = () => {
       backgroundMusic.get().stop();
       new Sound('assets/sounds/game_over.mp3', { volume: 4 }).get().play();
       this.swithToGameOver();
     };
 
-    this.player.create();
-
-    const normalZombie = new NormalZombie();
-    this.playScene.addChild(normalZombie);
-
-    const brainiacZombie = new BrainiacZombie();
-    brainiacZombie.x = 1550;
-    brainiacZombie.y = 850;
-
-    this.playScene.addChild(brainiacZombie);
-
+    this.player.create()
     this.objectList.push(this.player);
-    this.objectList.push(normalZombie, brainiacZombie);
-
     backgroundMusic.get().play();
   }
 

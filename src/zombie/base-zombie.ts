@@ -24,7 +24,7 @@ export type ZombieConstructorParams = {
 export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject, Weapon {
   public speed: number;
   public health: number;
-
+  public score: number;
   protected spawnSound: Sound;
   protected deathSound: Sound;
 
