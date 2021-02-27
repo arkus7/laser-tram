@@ -1,6 +1,6 @@
 import '../styles.scss';
 
-import { RGBSplitFilter } from 'pixi-filters';
+import { GodrayFilter, RGBSplitFilter } from 'pixi-filters';
 import * as PIXI from 'pixi.js';
 
 import { Collisions } from './collisions';
@@ -309,7 +309,7 @@ export class Application {
       assets: postapo4MapSprites,
     });
 
-    // parallaxMap.children[0].filters = [new GodrayFilter()];
+    parallaxMap.children[0].filters = [new GodrayFilter()];
 
     this.playScene.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
