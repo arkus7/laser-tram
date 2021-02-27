@@ -2,21 +2,28 @@ import * as PIXI from 'pixi.js';
 
 import { SpriteObject } from './interfaces/spriteObject';
 import { Weapon } from './interfaces/weapon';
+import { Sound } from './sounds/sound';
 import { BaseZombie } from './zombie/base-zombie';
 
 export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon {
-  private app: PIXI.Application;
-  private xfinal: number;
-  private yfinal: number;
-
   private static readonly BULLET_SPEED = 14;
-  constructor(app) {
+
+  private fireSound: Sound;
+
+  constructor() {
     super(PIXI.Loader.shared.resources['assets/sprites/Vicodo_phone.png'].texture);
-    this.app = app;
+    this.initSounds();
   }
+
+  private initSounds() {
+    this.fireSound = new Sound('assets/sounds/laser_fire.mp3');
+    this.fireSound.get().play();
+  }
+
   isCollisable(): boolean {
     return true;
   }
+
   onCollision?(object: SpriteObject): void {
     if (object instanceof BaseZombie) {
       this.alpha = 0;
@@ -34,8 +41,7 @@ export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon {
   public create(x: number, y: number, xfinal?: number, yfinal?: number, rotation?: number): void {
     this.x = x;
     this.y = y;
-    this.xfinal = xfinal;
-    this.yfinal = yfinal;
+
     this.rotation = rotation;
   }
 

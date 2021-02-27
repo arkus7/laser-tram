@@ -84,7 +84,7 @@ export class Application {
   private async onClick(): Promise<void> {
     const mouseposition = this.app.renderer.plugins.interaction.mouse.global;
     console.log(mouseposition.x);
-    const projectile = new Projectile(this.app);
+    const projectile = new Projectile();
     let playerPos = this.player.getPosition();
     let dist_Y = mouseposition.y - playerPos.y;
     let dist_X = mouseposition.x - playerPos.x;
