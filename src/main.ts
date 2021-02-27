@@ -176,7 +176,7 @@ export class Application {
   private play = (delta: number): void => {
     Collisions.checkForCollisions(this.objectList);
 
-    if (Math.ceil(Math.random() * 200) % 100 == 0) {
+    if (Math.ceil(Math.random() * 200) % 50 == 0) {
       let zombie: BaseZombie;
 
       if (Math.ceil(Math.random() * 3) % 3 == 0) {
@@ -288,6 +288,20 @@ export class Application {
     restartGameText.interactive = true;
     restartGameText.buttonMode = true;
 
+    const statsText = new PIXI.Text('Stats', { ...upgradeMenuTextStyle, fontSize: 60 });
+    statsText.x = 50;
+    statsText.y = 500;
+
+    const currentHealthText = new PIXI.Text(`Health: ${this.playerMaxHealth}`, upgradeMenuTextStyle);
+    currentHealthText.x = statsText.x;
+    currentHealthText.y = statsText.y + 75;
+    const currentRamDamageText = new PIXI.Text(`Ram damage: ${this.playerDamage}`, upgradeMenuTextStyle);
+    currentRamDamageText.x = statsText.x;
+    currentRamDamageText.y = currentHealthText.y + 50;
+    const currentWeaponDamageText = new PIXI.Text(`Weapon damage: ${this.weaponDamage}`, upgradeMenuTextStyle);
+    currentWeaponDamageText.x = statsText.x;
+    currentWeaponDamageText.y = currentRamDamageText.y + 50;
+
     upgradeHealthButton.on('pointertap', () => {
       if (this.playerPoints >= this.healthUpgradeCost) {
         this.playerMaxHealth += 50;
@@ -295,6 +309,7 @@ export class Application {
         this.healthUpgradeCost = this.playerMaxHealth * 5;
         this.currentHealthText.text = this.healthUpgradeCost.toString();
         this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
+        currentHealthText.text = `Health: ${this.playerMaxHealth}`;
       }
     });
 
@@ -305,6 +320,7 @@ export class Application {
         this.ramDamageUpgradeCost = this.playerDamage * 5;
         this.upgradeRamDamageCostText.text = this.ramDamageUpgradeCost.toString();
         this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
+        currentRamDamageText.text = `Ram damage: ${this.playerDamage}`;
       }
     });
 
@@ -315,6 +331,7 @@ export class Application {
         this.weaponUpgradeCost = this.weaponDamage * 10;
         this.upgradeWeaponDamageCostText.text = this.weaponUpgradeCost.toString();
         this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
+        currentWeaponDamageText.text = `Weapon damage: ${this.weaponDamage}`;
       }
     });
 
@@ -334,6 +351,11 @@ export class Application {
     this.upgradeScene.addChild(upgradeWeaponDamageText);
     this.upgradeScene.addChild(upgradeWeaponDamageButton);
     this.upgradeScene.addChild(this.upgradeWeaponDamageCostText);
+
+    this.upgradeScene.addChild(statsText);
+    this.upgradeScene.addChild(currentHealthText);
+    this.upgradeScene.addChild(currentRamDamageText);
+    this.upgradeScene.addChild(currentWeaponDamageText);
 
     this.upgradeScene.addChild(restartGameText);
   }
