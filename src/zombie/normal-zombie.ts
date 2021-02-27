@@ -3,7 +3,9 @@ import { ZombieType } from './zombie-enums';
 
 export class NormalZombie extends BaseZombie {
   public health = 25;
+  public score = 10;
 
+  
   constructor() {
     super({
       type: ZombieType.Normal,
