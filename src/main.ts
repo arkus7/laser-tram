@@ -252,11 +252,18 @@ export class Application {
   }
 
   private destroyObjectWhenOutOfBounds(object: PIXI.Container) {
-    if (
-      !isDestroyed(object) &&
-      (object.x > this.playScene.width + 3 * object.width || object.y > this.playScene.height + 3 * object.height)
-    ) {
-      object.destroy({ children: true });
+    if (!isDestroyed(object)) {
+      const { x, y, width, height } = object;
+      const widthOffset = 3 * width;
+      const hightOffset = 3 * height;
+
+      if (
+        x > this.playScene.width + widthOffset ||
+        x < 0 - widthOffset ||
+        y > this.playScene.height + hightOffset ||
+        y < 0 - hightOffset
+      )
+        object.destroy({ children: true });
     }
   }
 }
