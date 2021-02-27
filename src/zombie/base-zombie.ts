@@ -4,6 +4,7 @@ import { HealthBar } from '../health-bar';
 import { SpriteObject } from '../interfaces/spriteObject';
 import { Weapon } from '../interfaces/weapon';
 import { Player } from '../player';
+import { Sound } from '../sound';
 import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
 
@@ -16,6 +17,9 @@ export type ZombieConstructorParams = {
 export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject, Weapon {
   public speed: number;
   public health: number;
+
+  private spawnSound: Sound;
+  private deathSound: Sound;
 
   public onDeadEvent: Function;
 
@@ -36,6 +40,8 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.type = type;
     this.state = initialState;
 
+    this.initSounds();
+
     this.animationSpeed = 0.2;
     this.play();
 
@@ -48,6 +54,21 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.speed = 1;
 
     this.addHealthBar(new HealthBar(this.width * -1, -20, 100, 100));
+
+    this.spawnSound.get().play();
+  }
+
+  private initSounds(): void {
+    if (this.type === ZombieType.Normal) {
+      this.spawnSound = new Sound('assets/sounds/zombie_normal_spawn.mp3');
+      this.deathSound = new Sound('assets/sounds/zombie_normal_dead.mp3');
+    } else if (this.type === ZombieType.Brainiac) {
+      this.spawnSound = new Sound('assets/sounds/zombie_brainiac_spawn.mp3');
+      this.deathSound = new Sound('assets/sounds/zombie_brainiac_dead.mp3');
+    } else if (this.type === ZombieType.Zaba) {
+      this.spawnSound = new Sound('assets/sounds/zombie_zaba_spawn.mp3');
+      this.deathSound = new Sound('assets/sounds/zombie_zaba_dead.mp3');
+    }
   }
 
   public isAlive(): boolean {
@@ -131,8 +152,14 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
       this.health -= object.getDamage();
       this.healthBar?.onChangeHP(this.health);
 
-      if (!this.isAlive() && this.onDeadEvent) {
-        this.onDeadEvent();
+      if (!this.isAlive()) {
+        if (this.deathSound.get().isPlaying === false) {
+          this.deathSound.get().play();
+
+          if (this.onDeadEvent) {
+            this.onDeadEvent();
+          }
+        }
       }
     }
   }

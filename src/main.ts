@@ -12,6 +12,7 @@ import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
 import { ZombieType } from './zombie/zombie-enums';
+import { Sound } from './sound';
 import { ZabaZombie } from './zombie/zaba-zombie';
 
 const postapo4MapSprites = [
@@ -69,6 +70,8 @@ export class Application {
     const player = new Player(this.app);
 
     player.onDeadEvent = () => {
+      backgroundMusic.get().stop();
+      new Sound('assets/sounds/game_over.mp3', { volume: 4 }).get().play();
       console.log('test', 'Player is dead');
     };
 
@@ -79,6 +82,8 @@ export class Application {
 
     this.app.stage.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
+
+    const backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
 
     await player.create();
     player.addHealthBar(new HealthBar(player.width / 8, -20, 100, 100));
@@ -94,6 +99,8 @@ export class Application {
 
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
+
+    backgroundMusic.get().play();
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }

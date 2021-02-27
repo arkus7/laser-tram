@@ -33,7 +33,7 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
   }
 
   private initSounds() {
-    this.changeTracksSound = new Sound('assets/sounds/tram-select.mp3', { speed: 0.5 });
+    this.changeTracksSound = new Sound('assets/sounds/track-switch.mp3', { speed: 0.5 });
   }
 
   public async create(): Promise<void> {
@@ -97,7 +97,7 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
           Player.VERTICAL_TELEPORT * (Player.NUM_OF_TRACKS - 1)
       ) {
         this.y -= Player.VERTICAL_TELEPORT;
-        this.changeTracksSound.play();
+        this.changeTracksSound.get().play();
       }
     };
 
@@ -107,7 +107,7 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
         this.app.renderer.screen.height - this.height - Player.START_TRACK_RELATIVE_POSITION_Y
       ) {
         this.y += Player.VERTICAL_TELEPORT;
-        this.changeTracksSound.play();
+        this.changeTracksSound.get().play();
       }
     };
   }
@@ -138,12 +138,14 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
   };
 
   public onCollision = (object: SpriteObject): void => {
-    if (object instanceof BaseZombie) {
-      this.health -= object.getDamage();
-      this.healthBar?.onChangeHP(this.health);
+    if (this.isAlive()) {
+      if (object instanceof BaseZombie) {
+        this.health -= object.getDamage();
+        this.healthBar?.onChangeHP(this.health);
 
-      if (!this.isAlive() && this.onDeadEvent) {
-        this.onDeadEvent();
+        if (!this.isAlive() && this.onDeadEvent) {
+          this.onDeadEvent();
+        }
       }
     }
   };

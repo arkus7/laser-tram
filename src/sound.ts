@@ -5,10 +5,13 @@ export class Sound {
 
   constructor(asset: string, options?: PIXISound.Options) {
     this.sound = PIXISound.Sound.from(asset);
-    this.sound.speed = options?.speed;
+
+    this.sound.speed = options?.speed || 1;
+    this.sound.loop = options?.loop || false;
+    this.sound.volume = options?.volume || 1;
   }
 
-  public play() {
-    this.sound.play();
+  public get() {
+    return this.sound;
   }
 }
