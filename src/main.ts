@@ -35,9 +35,11 @@ export class Application {
   private width = APP_WIDTH;
   private height = APP_HEIGHT;
   private player: Player;
-  private scoreCount;
+  private scoreCountText: PIXI.Text;
   private gameOverCounter = 0;
   private playerPoints = 0;
+  private playerDamage = 5;
+  private playerMaxHealth = 100;
   private healthUpgradeCost = 0;
   private weaponDamageUpgradeCost = 0;
 
@@ -181,7 +183,7 @@ export class Application {
       zombie.onDeadEvent = () => {
         this.player.addToScore(zombie.score);
         let text = this.player.getTotalScore();
-        this.scoreCount.text = text.toString();
+        this.scoreCountText.text = text.toString();
       };
       zombie.x = Math.random() * 600 + this.app.screen.width;
       const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
@@ -229,7 +231,7 @@ export class Application {
     });
 
     this.playerPointsText = new PIXI.Text(`Player points: ${this.playerPoints.toString()}`, upgradeMenuTextStyle);
-    this.playerPointsText.x = APP_WIDTH - this.playerPointsText.width - 50;
+    this.playerPointsText.x = APP_WIDTH - this.playerPointsText.width - 100;
     this.playerPointsText.y = 100;
 
     const upgradeHealthText = new PIXI.Text('Upgrade health', upgradeMenuTextStyle);
@@ -268,9 +270,9 @@ export class Application {
 
     upgradeHealthButton.on('pointertap', () => {
       if (this.playerPoints >= this.healthUpgradeCost) {
-        this.player.setMaxHealth(this.player.getMaxHealth() + 1);
+        this.playerMaxHealth += 50;
         this.playerPoints -= this.healthUpgradeCost;
-        this.healthUpgradeCost = this.player.getMaxHealth() * 5;
+        this.healthUpgradeCost = this.playerMaxHealth * 5;
         this.currentHealthText.text = this.healthUpgradeCost.toString();
         this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
       }
@@ -278,9 +280,9 @@ export class Application {
 
     upgradeWeaponDamageButton.on('pointertap', () => {
       if (this.playerPoints >= this.weaponDamageUpgradeCost) {
-        this.player.setDamage(this.player.getDamage() + 1);
+        this.playerDamage += 10;
         this.playerPoints -= this.weaponDamageUpgradeCost;
-        this.weaponDamageUpgradeCost = this.player.getDamage() * 5;
+        this.weaponDamageUpgradeCost = this.playerDamage * 5;
         this.currentWeaponDamageText.text = this.weaponDamageUpgradeCost.toString();
         this.playerPointsText.text = `Player points: ${this.playerPoints.toString()}`;
       }
@@ -313,6 +315,9 @@ export class Application {
     this.objectList.push(parallaxMap);
 
     this.player = new Player();
+    this.player.setDamage(this.playerDamage);
+    this.player.setMaxHealth(this.playerMaxHealth);
+    this.player.addToScore(this.playerPoints);
     this.playScene.addChild(this.player);
 
     const scoreStyle = new PIXI.TextStyle({
@@ -320,10 +325,10 @@ export class Application {
       fontSize: 120,
       fill: 'white',
     });
-    this.scoreCount = new PIXI.Text('0', scoreStyle);
-    this.scoreCount.x = 100;
-    this.scoreCount.y = 100;
-    this.playScene.addChild(this.scoreCount);
+    this.scoreCountText = new PIXI.Text('0', scoreStyle);
+    this.scoreCountText.x = 100;
+    this.scoreCountText.y = 100;
+    this.playScene.addChild(this.scoreCountText);
 
     this.player.onDeadEvent = () => {
       backgroundMusic.get().stop();
