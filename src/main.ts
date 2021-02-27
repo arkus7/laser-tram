@@ -60,6 +60,9 @@ export class Application {
 
   private objectList: Array<SpriteObject & PIXI.Container> = new Array();
 
+  private cheatKeysSequence: string[] = 'zelki'.split('');
+  private keysSequence: string[] = [];
+
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
 
@@ -123,9 +126,27 @@ export class Application {
     this.setupUpgradeScene();
     this.setupGameOverScene();
 
+    this.setupCheats();
+
     this.appStage = this.play;
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
+  }
+
+  private setupCheats() {
+    window.addEventListener('keypress', (event) => {
+      const index = this.keysSequence.length;
+      if (event.key === this.cheatKeysSequence[index]) {
+        this.keysSequence.push(event.key);
+        if (this.keysSequence.join() === this.cheatKeysSequence.join()) {
+          this.keysSequence.length = 0;
+          this.player.addToScore(1000);
+          this.scoreCountText.text = this.player.getTotalScore().toString();
+        }
+      } else {
+        this.keysSequence.length = 0;
+      }
+    });
   }
 
   private setupGameOverScene(): void {
