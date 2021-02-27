@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js';
 
 import { SpriteObject } from './interfaces/spriteObject';
+import { isDestroyed } from './main';
 
 interface CollisionsExtraFields {
   centerX: number;
@@ -16,9 +17,14 @@ export class Collisions {
         if (i === j) {
           continue;
         }
+        const obj1 = collisableObjects[i];
+        const obj2 = collisableObjects[j];
+        if (isDestroyed(obj1) || isDestroyed(obj2)) {
+          continue;
+        }
 
-        if (Collisions.checkForCollision(collisableObjects[i], collisableObjects[j])) {
-          collisableObjects[i]?.onCollision(collisableObjects[j]);
+        if (Collisions.checkForCollision(obj1, obj2)) {
+          obj1?.onCollision(obj2);
         }
       }
     }
