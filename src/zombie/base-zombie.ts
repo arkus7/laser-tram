@@ -129,9 +129,10 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
 
   onCollision(object: SpriteObject): void {
     if (object instanceof Player || object instanceof Projectile) {
-      this.health -= object.getDamage();
-      this.healthBar?.onChangeHP(this.health);
-
+      if(object.getDamage() != 0){
+        this.health -= object.getDamage();
+        this.healthBar?.onChangeHP(this.health);
+      }
       if (!this.isAlive() && this.onDeadEvent) {
         this.onDeadEvent();
       }

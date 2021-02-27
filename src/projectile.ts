@@ -20,12 +20,16 @@ export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon{
   onCollision?(object: SpriteObject): void {
     if (object instanceof BaseZombie) {
       this.alpha = 0;
-      
     }
   }
 
   getDamage(): number {
-    return 2;
+    if (this.alpha === 0) {
+      return 0;
+    }
+    else {
+      return 5;
+    }
   }
 
   public async create(x: number, y: number, xfinal?: number, yfinal?: number, rotation?: number): Promise<void> {
@@ -50,6 +54,9 @@ export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon{
   }
   
   public onUpdate = (delta: number): void => {
+    if (this._destroyed) {
+      return;
+    }
     this.position.x += Math.cos(this.rotation)*Projectile.BULLET_SPEED;
     this.position.y += Math.sin(this.rotation)*Projectile.BULLET_SPEED;
 
