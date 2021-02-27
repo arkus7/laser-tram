@@ -1,6 +1,6 @@
 import '../styles.scss';
 
-import { GodrayFilter } from 'pixi-filters';
+import { GodrayFilter, RGBSplitFilter } from 'pixi-filters';
 import * as PIXI from 'pixi.js';
 
 import { Collisions } from './collisions';
@@ -35,6 +35,8 @@ export class Application {
   private width = APP_WIDTH;
   private height = APP_HEIGHT;
   private player: Player;
+
+  private gameOverCounter = 0;
 
   private appStage: (delta?: number) => void;
 
@@ -130,6 +132,7 @@ export class Application {
     });
 
     const tram = new PIXI.Sprite(PIXI.Loader.shared.resources['assets/sprites/map/postapo4/train.png'].texture);
+    tram.x = -150;
 
     this.gameOverScene.addChild(tram);
     this.gameOverScene.addChild(gameOverText);
@@ -169,7 +172,19 @@ export class Application {
     });
   };
 
-  private gameOver = (): void => {};
+  private gameOver = (): void => {
+    if (this.gameOverCounter % 10 == 0) {
+      const maxOffset = 30;
+      this.gameOverScene.filters = [
+        new RGBSplitFilter(
+          new PIXI.Point(Math.random() * maxOffset, Math.random()),
+          new PIXI.Point(Math.random() * maxOffset, Math.random()),
+          new PIXI.Point(Math.random() * maxOffset, Math.random())
+        ),
+      ];
+    }
+    this.gameOverCounter += 1;
+  };
 
   private setupPlayScene() {
     const backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
