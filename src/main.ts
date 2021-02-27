@@ -325,7 +325,7 @@ export class Application {
       fontSize: 120,
       fill: 'white',
     });
-    this.scoreCountText = new PIXI.Text('0', scoreStyle);
+    this.scoreCountText = new PIXI.Text(this.player.getTotalScore().toString(), scoreStyle);
     this.scoreCountText.x = 100;
     this.scoreCountText.y = 100;
     this.playScene.addChild(this.scoreCountText);
