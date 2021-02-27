@@ -120,11 +120,8 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
   }
 
   public addToScore(score: number): number {
-
- this.totalScore += score;
-  console.log(score);
-    
-     return this.totalScore;
+    this.totalScore += score;
+    return this.totalScore;
     
  }
 
