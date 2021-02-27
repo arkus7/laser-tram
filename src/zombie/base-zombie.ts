@@ -5,18 +5,27 @@ import { SpriteObject } from '../interfaces/spriteObject';
 import { Weapon } from '../interfaces/weapon';
 import { isDestroyed } from '../main';
 import { Player } from '../player';
+import { Sound } from '../sounds/sound';
 import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
+import { Projectile } from '../projectile';
 
 export type ZombieConstructorParams = {
   type: ZombieType;
   initialState?: ZombieState;
   autoUpdate?: boolean;
+  sounds?: {
+    spawn: string;
+    death: string;
+  };
 };
 
 export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject, Weapon {
   public speed: number;
   public health: number;
+
+  protected spawnSound: Sound;
+  protected deathSound: Sound;
 
   public onDeadEvent: Function;
 
@@ -31,11 +40,19 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     return assets.map((assetPath) => PIXI.Loader.shared.resources[assetPath].texture);
   }
 
-  constructor({ type, initialState = ZombieState.Attack, autoUpdate = true }: ZombieConstructorParams) {
+  constructor({
+    type,
+    initialState = ZombieState.Attack,
+    autoUpdate = true,
+    sounds = { spawn: 'assets/sounds/zombie_normal_spawn.mp3', death: 'assets/sounds/zombie_normal_dead.mp3' },
+  }: ZombieConstructorParams) {
     super(BaseZombie.texturesForType(type, initialState), autoUpdate);
 
     this.type = type;
     this.state = initialState;
+
+    this.spawnSound = new Sound(sounds.spawn);
+    this.deathSound = new Sound(sounds.death);
 
     this.animationSpeed = 0.2;
     this.play();
@@ -49,6 +66,8 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.speed = 1;
 
     this.addHealthBar(new HealthBar(this.width * -1, -20, 100, 100));
+
+    this.spawnSound.get().play();
   }
 
   public isAlive(): boolean {
@@ -126,12 +145,19 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onCollision(object: SpriteObject): void {
-    if (object instanceof Player) {
+    if (object instanceof Player  || object instanceof Projectile) {
+      if(object.getDamage() != 0){
       this.health -= object.getDamage();
       this.healthBar?.onChangeHP(this.health);
+      }
+      if (!this.isAlive()) {
+        if (this.deathSound.get().isPlaying === false) {
+          this.deathSound.get().play();
 
-      if (!this.isAlive() && this.onDeadEvent) {
-        this.onDeadEvent();
+          if (this.onDeadEvent) {
+            this.onDeadEvent();
+          }
+        }
       }
     }
   }

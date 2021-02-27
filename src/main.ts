@@ -7,10 +7,13 @@ import { SpriteObject } from './interfaces/spriteObject';
 import { ParallaxMap } from './parallax-map';
 import { Player } from './player';
 import { Projectile } from './projectile';
+import { Sound } from './sounds/sound';
+import { soundAssets } from './sounds/utils';
 import { BaseZombie } from './zombie/base-zombie';
 import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
+import { ZabaZombie } from './zombie/zaba-zombie';
 import { ZombieType } from './zombie/zombie-enums';
 
 const postapo4MapSprites = [
@@ -56,10 +59,12 @@ export class Application {
     PIXI.Loader.shared
       .add(assetsForZombie(ZombieType.Normal))
       .add(assetsForZombie(ZombieType.Brainiac))
+      .add(assetsForZombie(ZombieType.Zaba))
       .add(postapo4MapSprites)
       .add('assets/sprites/tram.png')
       .add('assets/sprites/map.jpg')
       .add('assets/sprites/Vicodo_phone.png')
+      .add(soundAssets())
       .load(() => this.setup());
   }
 
@@ -139,11 +144,14 @@ export class Application {
 
     if (Math.ceil(Math.random() * 200) % 100 == 0) {
       let zombie: BaseZombie;
-      if (Math.ceil(Math.random() * 3) % 2 == 0) {
+      if (Math.ceil(Math.random() * 3) % 3 == 0) {
         zombie = new NormalZombie();
-      } else {
+      } else if (Math.ceil(Math.random() * 3) % 3 == 1) {
         zombie = new BrainiacZombie();
+      } else {
+        zombie = new ZabaZombie();
       }
+
       zombie.x = Math.random() * 600 + this.app.screen.width;
       const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
       zombie.y = Math.min(randomY, this.playScene.height - zombie.height);
@@ -163,6 +171,7 @@ export class Application {
   private gameOver = (): void => {};
 
   private setupPlayScene() {
+    const backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
     const parallaxMap = new ParallaxMap({
       renderer: this.app.renderer,
       assets: postapo4MapSprites,
@@ -175,7 +184,8 @@ export class Application {
     this.playScene.addChild(this.player);
 
     this.player.onDeadEvent = () => {
-      console.log('test', 'Player is dead');
+      backgroundMusic.get().stop();
+      new Sound('assets/sounds/game_over.mp3', { volume: 4 }).get().play();
       this.swithToGameOver();
     };
 
@@ -192,6 +202,8 @@ export class Application {
 
     this.objectList.push(this.player);
     this.objectList.push(normalZombie, brainiacZombie);
+
+    backgroundMusic.get().play();
   }
 
   private swithToGameOver(): void {

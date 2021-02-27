@@ -1,6 +1,7 @@
 export enum ZombieType {
   Normal = 'normal',
   Brainiac = 'brainiac',
+  Zaba = 'zaba',
 }
 
 export enum ZombieState {

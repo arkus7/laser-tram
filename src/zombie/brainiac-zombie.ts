@@ -5,7 +5,13 @@ export class BrainiacZombie extends BaseZombie {
   public health = 50;
 
   constructor() {
-    super({ type: ZombieType.Brainiac });
+    super({
+      type: ZombieType.Brainiac,
+      sounds: {
+        spawn: 'assets/sounds/zombie_brainiac_spawn.mp3',
+        death: 'assets/sounds/zombie_brainiac_dead.mp3',
+      },
+    });
   }
 
   public getDamage(): number {
