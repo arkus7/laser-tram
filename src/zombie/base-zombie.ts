@@ -6,6 +6,7 @@ import { Weapon } from '../interfaces/weapon';
 import { Player } from '../player';
 import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
+import { Projectile } from '../projectile';
 
 export type ZombieConstructorParams = {
   type: ZombieType;
@@ -127,7 +128,7 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onCollision(object: SpriteObject): void {
-    if (object instanceof Player) {
+    if (object instanceof Player || object instanceof Projectile) {
       this.health -= object.getDamage();
       this.healthBar?.onChangeHP(this.health);
 
