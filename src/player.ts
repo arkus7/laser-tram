@@ -1,18 +1,27 @@
 import * as PIXI from 'pixi.js';
+import { HealthBar } from './health-bar';
+import { LivingBeing } from './interfaces/living-being';
 
 import { SpriteObject } from './interfaces/spriteObject';
+import { Weapon } from './interfaces/weapon';
 import { Keyboard } from './keyboard';
+import { BaseZombie } from './zombie/base-zombie';
 
-export class Player extends PIXI.Sprite implements SpriteObject {
+export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, Weapon {
   private app: PIXI.Application;
+  private healthBar: HealthBar;
 
   private vx: number;
   private vy: number;
 
+  public health = 100;
+
   private static readonly SPEED = 5;
   private static readonly VERTICAL_TELEPORT = 70;
-  private static readonly NUM_OF_TRACKS = 5;
+  private static readonly NUM_OF_TRACKS = 2;
   private static readonly START_TRACK_RELATIVE_POSITION_Y = 15;
+
+  public onDeadEvent: Function;
 
   constructor(app) {
     super(PIXI.Loader.shared.resources['assets/sprites/tram.png'].texture);
@@ -31,6 +40,11 @@ export class Player extends PIXI.Sprite implements SpriteObject {
     this.setKeyboardEvents();
 
     this.app.stage.addChild(this);
+  }
+
+  public addHealthBar(bar: HealthBar): void {
+    this.healthBar = bar;
+    this.addChild(this.healthBar);
   }
 
   public getPosition(): { x: number; y: number } {
@@ -92,6 +106,18 @@ export class Player extends PIXI.Sprite implements SpriteObject {
     return true;
   }
 
+  public isAlive(): boolean {
+    return this.health > 0;
+  }
+
+  public getDamage(): number {
+    return 5;
+  }
+
+  public addOnDeadEvent(callback: Function): void {
+    this.onDeadEvent = callback;
+  }
+
   public onUpdate = (delta: number): void => {
     this.x += this.vx;
     this.y += this.vy;
@@ -102,6 +128,13 @@ export class Player extends PIXI.Sprite implements SpriteObject {
   };
 
   public onCollision = (object: SpriteObject): void => {
-    console.log('test', 'tram collision! with', object);
+    if (object instanceof BaseZombie) {
+      this.health -= object.getDamage();
+      this.healthBar?.onChangeHP(this.health);
+
+      if (!this.isAlive() && this.onDeadEvent) {
+        this.onDeadEvent();
+      }
+    }
   };
 }

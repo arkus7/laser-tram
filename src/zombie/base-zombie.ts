@@ -1,6 +1,9 @@
 import * as PIXI from 'pixi.js';
+import { HealthBar } from '../health-bar';
 
 import { SpriteObject } from '../interfaces/spriteObject';
+import { Weapon } from '../interfaces/weapon';
+import { Player } from '../player';
 import { assetsForZombie, spritesPerZombieState } from './utils';
 import { ZombieState, ZombieType } from './zombie-enums';
 
@@ -10,8 +13,13 @@ export type ZombieConstructorParams = {
   autoUpdate?: boolean;
 };
 
-export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject {
+export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteObject, Weapon {
   public speed: number;
+  public health: number;
+
+  public onDeadEvent: Function;
+
+  private healthBar: HealthBar;
 
   private type: ZombieType;
   private state: ZombieState;
@@ -38,6 +46,23 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
     this.anchor.x = 1;
 
     this.speed = 1;
+  }
+
+  public isAlive(): boolean {
+    return this.health > 0;
+  }
+
+  public addHealthBar(bar: HealthBar): void {
+    this.healthBar = bar;
+    this.addChild(this.healthBar);
+  }
+
+  public getDamage(): number {
+    return this.isAlive() ? 1 : 0;
+  }
+
+  public addOnDeadEvent(callback: Function): void {
+    this.onDeadEvent = callback;
   }
 
   public setState(state: ZombieState): void {
@@ -83,6 +108,13 @@ export abstract class BaseZombie extends PIXI.AnimatedSprite implements SpriteOb
   }
 
   onCollision(object: SpriteObject): void {
-    //
+    if (object instanceof Player) {
+      this.health -= object.getDamage();
+      this.healthBar?.onChangeHP(this.health);
+
+      if (!this.isAlive() && this.onDeadEvent) {
+        this.onDeadEvent();
+      }
+    }
   }
 }

@@ -3,7 +3,7 @@ import '../styles.scss';
 import * as PIXI from 'pixi.js';
 
 import { Collisions } from './collisions';
-import { HealthBar } from './healthbar';
+import { HealthBar } from './health-bar';
 import { SpriteObject } from './interfaces/spriteObject';
 import { ParallaxMap } from './parallax-map';
 import { Player } from './player';
@@ -64,7 +64,10 @@ export class Application {
 
   private async setup(): Promise<void> {
     const player = new Player(this.app);
-    const bar = new HealthBar(this.app); //main bar for train hp
+
+    player.onDeadEvent = () => {
+      console.log('test', 'Player is dead');
+    };
 
     const parallaxMap = new ParallaxMap({
       renderer: this.app.renderer,
@@ -75,12 +78,14 @@ export class Application {
     this.objectList.push(parallaxMap);
 
     await player.create();
-    await bar.create(90, 20, 100, 100, false);
+    player.addHealthBar(new HealthBar(player.width / 8, -20, 100, 100));
 
     const normalZombie = new NormalZombie();
+    normalZombie.addHealthBar(new HealthBar(normalZombie.width * -1, -20, 100, 100));
     this.app.stage.addChild(normalZombie);
 
     const brainiacZombie = new BrainiacZombie();
+    brainiacZombie.addHealthBar(new HealthBar(brainiacZombie.width * -1, -20, 100, 100));
     brainiacZombie.x = 1550;
     brainiacZombie.y = 850;
 
@@ -88,7 +93,6 @@ export class Application {
 
     this.objectList.push(player);
     this.objectList.push(normalZombie, brainiacZombie);
-    this.objectList.push(bar);
 
     this.app.ticker.add((delta) => this.gameLoop(delta));
   }
