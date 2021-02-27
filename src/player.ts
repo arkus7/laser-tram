@@ -1,38 +1,56 @@
 import * as PIXI from 'pixi.js';
-import { loadSprite } from './helpers';
-import { SpriteObject } from './interfaces/spriteObject';
-import { Keyboard } from './keyboard';
+import { HealthBar } from './health-bar';
+import { LivingBeing } from './interfaces/living-being';
 
-export class Player implements SpriteObject {
+import { SpriteObject } from './interfaces/spriteObject';
+import { Weapon } from './interfaces/weapon';
+import { Keyboard } from './keyboard';
+import { BaseZombie } from './zombie/base-zombie';
+
+export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, Weapon {
   private app: PIXI.Application;
-  private player: PIXI.Sprite & { vx?: number; vy?: number };
+  private healthBar: HealthBar;
+
+  private vx: number;
+  private vy: number;
+
+  public health = 100;
 
   private static readonly SPEED = 5;
   private static readonly VERTICAL_TELEPORT = 70;
-  private static readonly NUM_OF_TRACKS = 3;
+  private static readonly NUM_OF_TRACKS = 2;
   private static readonly START_TRACK_RELATIVE_POSITION_Y = 15;
 
+  public onDeadEvent: Function;
+
   constructor(app) {
+    super(PIXI.Loader.shared.resources['assets/sprites/tram.png'].texture);
     this.app = app;
   }
 
   public async create(): Promise<void> {
-    this.player = await loadSprite(this.app, 'assets/sprites/tram.png');
-    this.player.x = 15;
-    this.player.y = this.app.renderer.screen.height - this.player.height - Player.START_TRACK_RELATIVE_POSITION_Y;
+    this.scale.set(2, 2);
 
-    this.player.vx = 0;
-    this.player.vy = 0;
+    this.x = 15;
+    this.y = this.app.renderer.screen.height - this.height - Player.START_TRACK_RELATIVE_POSITION_Y;
+
+    this.vx = 0;
+    this.vy = 0;
 
     this.setKeyboardEvents();
 
-    this.app.stage.addChild(this.player);
+    this.app.stage.addChild(this);
+  }
+
+  public addHealthBar(bar: HealthBar): void {
+    this.healthBar = bar;
+    this.addChild(this.healthBar);
   }
 
   public getPosition(): { x: number; y: number } {
     return {
-      x: this.player.x,
-      y: this.player.y,
+      x: this.x,
+      y: this.y,
     };
   }
 
@@ -43,53 +61,80 @@ export class Player implements SpriteObject {
     const down = new Keyboard('ArrowDown');
 
     left.press = (): void => {
-      this.player.vx = -Player.SPEED;
+      this.vx = -Player.SPEED;
     };
 
     left.release = (): void => {
       if (!right.isDown) {
-        this.player.vx = 0;
+        this.vx = 0;
       }
     };
 
     right.press = (): void => {
-      this.player.vx = Player.SPEED;
+      this.vx = Player.SPEED;
     };
 
     right.release = (): void => {
       if (!left.isDown) {
-        this.player.vx = 0;
+        this.vx = 0;
       }
     };
 
     up.press = (): void => {
       if (
-        this.player.y - Player.VERTICAL_TELEPORT >=
+        this.y - Player.VERTICAL_TELEPORT >=
         this.app.renderer.screen.height -
-          this.player.height -
+          this.height -
           Player.START_TRACK_RELATIVE_POSITION_Y -
           Player.VERTICAL_TELEPORT * (Player.NUM_OF_TRACKS - 1)
       ) {
-        this.player.y -= Player.VERTICAL_TELEPORT;
+        this.y -= Player.VERTICAL_TELEPORT;
       }
     };
 
     down.press = (): void => {
       if (
-        this.player.y + Player.VERTICAL_TELEPORT <=
-        this.app.renderer.screen.height - this.player.height - Player.START_TRACK_RELATIVE_POSITION_Y
+        this.y + Player.VERTICAL_TELEPORT <=
+        this.app.renderer.screen.height - this.height - Player.START_TRACK_RELATIVE_POSITION_Y
       ) {
-        this.player.y += Player.VERTICAL_TELEPORT;
+        this.y += Player.VERTICAL_TELEPORT;
       }
     };
   }
 
+  public isCollisable(): boolean {
+    return true;
+  }
+
+  public isAlive(): boolean {
+    return this.health > 0;
+  }
+
+  public getDamage(): number {
+    return 5;
+  }
+
+  public addOnDeadEvent(callback: Function): void {
+    this.onDeadEvent = callback;
+  }
+
   public onUpdate = (delta: number): void => {
-    this.player.x += this.player.vx;
-    this.player.y += this.player.vy;
+    this.x += this.vx;
+    this.y += this.vy;
   };
 
   public onResize = (width: number, height: number): void => {
     // to be implemented
+  };
+
+  public onCollision = (object: SpriteObject): void => {
+    if (object instanceof BaseZombie) {
+      this.health -= object.getDamage();
+      this.healthBar?.onChangeHP(this.health);
+
+      if (!this.isAlive() && this.onDeadEvent) {
+        this.onDeadEvent();
+      }
+    }
   };
 }
