@@ -6,6 +6,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "pixi-filters": "^3.2.2",
     "pixi-sound": "^3.0.5",
     "pixi.js": "5.2.1"
   },

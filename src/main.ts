@@ -16,6 +16,7 @@ import { ZombieType } from './zombie/zombie-enums';
 import { Sound } from './sounds/sound';
 import { ZabaZombie } from './zombie/zaba-zombie';
 import { soundAssets } from './sounds/utils';
+import { GodrayFilter } from 'pixi-filters';
 
 const postapo4MapSprites = [
   'assets/sprites/map/postapo4/bg.png',
@@ -97,6 +98,8 @@ export class Application {
       renderer: this.app.renderer,
       assets: postapo4MapSprites,
     });
+
+    parallaxMap.filters = [new GodrayFilter()];
 
     this.app.stage.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
