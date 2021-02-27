@@ -38,6 +38,10 @@ export class Application {
   private scoreCountText: PIXI.Text;
   private gameOverCounter = 0;
 
+  private playerPointsText: PIXI.Text;
+  private currentHealthText: PIXI.Text;
+  private currentWeaponDamageText: PIXI.Text;
+
   private playerPoints = 0;
   private playerDamage = 5;
   private weaponDamage = 5;
@@ -47,8 +51,6 @@ export class Application {
   private ramDamageUpgradeCost = 0;
   private weaponUpgradeCost = 0;
 
-  private playerPointsText: PIXI.Text;
-  private currentHealthText: PIXI.Text;
   private upgradeRamDamageCostText: PIXI.Text;
   private upgradeWeaponDamageCostText: PIXI.Text;
 
