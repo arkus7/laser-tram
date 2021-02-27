@@ -7,6 +7,7 @@ import { HealthBar } from './health-bar';
 import { SpriteObject } from './interfaces/spriteObject';
 import { ParallaxMap } from './parallax-map';
 import { Player } from './player';
+import { BaseZombie } from './zombie/base-zombie';
 import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
 import { assetsForZombie } from './zombie/utils';
@@ -81,11 +82,9 @@ export class Application {
     player.addHealthBar(new HealthBar(player.width / 8, -20, 100, 100));
 
     const normalZombie = new NormalZombie();
-    normalZombie.addHealthBar(new HealthBar(normalZombie.width * -1, -20, 100, 100));
     this.app.stage.addChild(normalZombie);
 
     const brainiacZombie = new BrainiacZombie();
-    brainiacZombie.addHealthBar(new HealthBar(brainiacZombie.width * -1, -20, 100, 100));
     brainiacZombie.x = 1550;
     brainiacZombie.y = 850;
 
@@ -102,7 +101,20 @@ export class Application {
   };
 
   private play = (delta: number): void => {
-    Collisions.checkForCollisions(this.objectList);
+    Collisions.checkForCollisions(this.objectList.filter((obj) => !(obj as any)._destroyed));
+
+    if (Math.ceil(Math.random() * 200) % 100 == 0) {
+      let zombie: BaseZombie;
+      if (Math.ceil(Math.random() * 3) % 2 == 0) {
+        zombie = new NormalZombie();
+      } else {
+        zombie = new BrainiacZombie();
+      }
+      zombie.x = Math.random() * 600 + this.app.screen.width;
+      zombie.y = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
+      this.objectList.push(zombie);
+      this.app.stage.addChild(zombie);
+    }
 
     this.objectList.forEach((object) => {
       object.onUpdate(delta);
