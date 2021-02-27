@@ -41,6 +41,7 @@ export class Application {
   private appStage: (delta?: number) => void;
 
   private playScene: PIXI.Container;
+  private upgradeScene: PIXI.Container;
   private gameOverScene: PIXI.Container;
 
   private objectList: Array<SpriteObject & PIXI.Container> = new Array();
@@ -96,12 +97,15 @@ export class Application {
 
   private async setup(): Promise<void> {
     this.playScene = new PIXI.Container();
+    this.upgradeScene = new PIXI.Container();
     this.gameOverScene = new PIXI.Container();
 
     this.app.stage.addChild(this.playScene);
+    this.app.stage.addChild(this.upgradeScene);
     this.app.stage.addChild(this.gameOverScene);
 
     this.setupPlayScene();
+    this.setupUpgradeScene();
     this.setupGameOverScene();
 
     this.appStage = this.play;
@@ -121,6 +125,12 @@ export class Application {
     gameOverText.x = APP_WIDTH / 2 - gameOverText.width / 2;
     gameOverText.y = 100;
 
+    const upgradeTramText = new PIXI.Text('Upgrade tram', { ...gameOverTextStyle, fontSize: 64 });
+    upgradeTramText.x = APP_WIDTH / 2 - upgradeTramText.width / 2;
+    upgradeTramText.y = APP_HEIGHT - upgradeTramText.height - 200;
+    upgradeTramText.interactive = true;
+    upgradeTramText.buttonMode = true;
+
     const restartGameText = new PIXI.Text('Restart Game', { ...gameOverTextStyle, fontSize: 64 });
     restartGameText.x = APP_WIDTH / 2 - restartGameText.width / 2;
     restartGameText.y = APP_HEIGHT - restartGameText.height - 100;
@@ -128,7 +138,11 @@ export class Application {
     restartGameText.buttonMode = true;
 
     restartGameText.on('pointertap', () => {
-      this.swithToPlayScene();
+      this.switchToPlayScene();
+    });
+
+    upgradeTramText.on('pointertap', () => {
+      this.swithToUpgradeScene();
     });
 
     const tram = new PIXI.Sprite(PIXI.Loader.shared.resources['assets/sprites/map/postapo4/train.png'].texture);
@@ -136,6 +150,7 @@ export class Application {
 
     this.gameOverScene.addChild(tram);
     this.gameOverScene.addChild(gameOverText);
+    this.gameOverScene.addChild(upgradeTramText);
     this.gameOverScene.addChild(restartGameText);
   }
 
@@ -172,6 +187,10 @@ export class Application {
     });
   };
 
+  private upgrade = (): void => {
+    //
+  };
+
   private gameOver = (): void => {
     if (this.gameOverCounter % 10 == 0) {
       const maxOffset = 30;
@@ -186,7 +205,70 @@ export class Application {
     this.gameOverCounter += 1;
   };
 
-  private setupPlayScene() {
+  private setupUpgradeScene(): void {
+    this.upgradeScene.visible = false;
+
+    let playerPoints = 7423; // read from player when ready
+
+    let healthUpgradeCost = this.player.getMaxHealth() * 5;
+    let weaponDamageUpgradeCost = this.player.getDamage() * 5;
+
+    const upgradeMenuTextStyle = new PIXI.TextStyle({
+      fontFamily: 'Futura',
+      fontSize: 48,
+      fill: 'white',
+    });
+
+    const upgradeHealthText = new PIXI.Text('Upgrade health', upgradeMenuTextStyle);
+    upgradeHealthText.x = 50;
+    upgradeHealthText.y = 100;
+
+    const upgradeHealthButton = new PIXI.Text('+', upgradeMenuTextStyle);
+    upgradeHealthButton.x = APP_WIDTH - 100;
+    upgradeHealthButton.y = 100;
+    upgradeHealthButton.interactive = true;
+    upgradeHealthButton.buttonMode = true;
+
+    const upgradeWeaponDamageText = new PIXI.Text('Upgrade weapon damage', upgradeMenuTextStyle);
+    upgradeWeaponDamageText.x = 50;
+    upgradeWeaponDamageText.y = 200;
+
+    const upgradeWeaponDamageButton = new PIXI.Text('+', upgradeMenuTextStyle);
+    upgradeWeaponDamageButton.x = APP_WIDTH - 100;
+    upgradeWeaponDamageButton.y = 200;
+    upgradeWeaponDamageButton.interactive = true;
+    upgradeWeaponDamageButton.buttonMode = true;
+
+    const restartGameText = new PIXI.Text('Restart Game', { ...upgradeMenuTextStyle, fontSize: 120 });
+    restartGameText.x = APP_WIDTH / 2 - restartGameText.width / 2;
+    restartGameText.y = APP_HEIGHT - restartGameText.height - 100;
+    restartGameText.interactive = true;
+    restartGameText.buttonMode = true;
+
+    upgradeHealthButton.on('pointertap', () => {
+      this.player.setMaxHealth(this.player.getMaxHealth() + 1);
+      playerPoints -= healthUpgradeCost;
+      healthUpgradeCost = this.player.getMaxHealth() * 5;
+    });
+
+    upgradeWeaponDamageButton.on('pointertap', () => {
+      this.player.setMaxHealth(this.player.getDamage() + 1);
+      playerPoints -= weaponDamageUpgradeCost;
+      weaponDamageUpgradeCost = this.player.getDamage() * 5;
+    });
+
+    restartGameText.on('pointertap', () => {
+      this.switchToPlayScene();
+    });
+
+    this.upgradeScene.addChild(upgradeHealthText);
+    this.upgradeScene.addChild(upgradeHealthButton);
+    this.upgradeScene.addChild(upgradeWeaponDamageText);
+    this.upgradeScene.addChild(upgradeWeaponDamageButton);
+    this.upgradeScene.addChild(restartGameText);
+  }
+
+  private setupPlayScene(): void {
     const backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
     const parallaxMap = new ParallaxMap({
       renderer: this.app.renderer,
@@ -204,7 +286,7 @@ export class Application {
     this.player.onDeadEvent = () => {
       backgroundMusic.get().stop();
       new Sound('assets/sounds/game_over.mp3', { volume: 4 }).get().play();
-      this.swithToGameOver();
+      this.switchToGameOver();
     };
 
     this.player.create();
@@ -224,15 +306,24 @@ export class Application {
     backgroundMusic.get().play();
   }
 
-  private swithToGameOver(): void {
+  private switchToGameOver(): void {
     this.playScene.visible = false;
+    this.upgradeScene.visible = false;
     this.gameOverScene.visible = true;
     this.appStage = this.gameOver;
   }
 
-  private swithToPlayScene(): void {
+  private swithToUpgradeScene(): void {
+    this.playScene.visible = false;
+    this.upgradeScene.visible = true;
+    this.gameOverScene.visible = false;
+    this.appStage = this.upgrade;
+  }
+
+  private switchToPlayScene(): void {
     this.resetPlayScene();
     this.playScene.visible = true;
+    this.upgradeScene.visible = false;
     this.gameOverScene.visible = false;
     this.appStage = this.play;
   }
