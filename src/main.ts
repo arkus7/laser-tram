@@ -65,6 +65,7 @@ export class Application {
   private keysSequence: string[] = [];
 
   private backgroundMusic: Sound;
+  private menuSelectSound: Sound;
 
   constructor() {
     const mainElement = document.getElementById('app') as HTMLElement;
@@ -132,6 +133,7 @@ export class Application {
     this.app.stage.addChild(this.gameOverScene);
 
     this.backgroundMusic = new Sound('assets/sounds/muzyka-z-dooma-full.mp3', { loop: true });
+    this.menuSelectSound = new Sound('assets/sounds/menu-select.mp3', { speed: 3, volume: 5 });
 
     this.setupPlayScene();
     this.setupUpgradeScene();
@@ -200,6 +202,7 @@ export class Application {
     startGameText.buttonMode = true;
 
     startGameText.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       this.switchToPlayScene();
     });
 
@@ -247,10 +250,12 @@ export class Application {
     restartGameText.buttonMode = true;
 
     restartGameText.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       this.switchToPlayScene();
     });
 
     upgradeTramText.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       this.swithToUpgradeScene();
     });
 
@@ -401,6 +406,7 @@ export class Application {
     currentWeaponDamageText.y = currentRamDamageText.y + 50;
 
     upgradeHealthButton.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       if (this.playerPoints >= this.healthUpgradeCost) {
         this.playerMaxHealth += 50;
         this.playerPoints -= this.healthUpgradeCost;
@@ -412,6 +418,7 @@ export class Application {
     });
 
     upgradeRamDamageButton.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       if (this.playerPoints >= this.ramDamageUpgradeCost) {
         this.playerDamage += 10;
         this.playerPoints -= this.ramDamageUpgradeCost;
@@ -423,6 +430,7 @@ export class Application {
     });
 
     upgradeWeaponDamageButton.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       if (this.playerPoints >= this.weaponUpgradeCost) {
         this.weaponDamage += 5;
         this.playerPoints -= this.weaponUpgradeCost;
@@ -434,6 +442,7 @@ export class Application {
     });
 
     restartGameText.on('pointertap', () => {
+      this.menuSelectSound.get().play();
       this.switchToPlayScene();
     });
 
