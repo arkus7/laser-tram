@@ -1,13 +1,12 @@
 import '../styles.scss';
 
 import * as PIXI from 'pixi.js';
-import { Map } from './map';
-import { Projectile } from './projectile';
+
 import { Collisions } from './collisions';
-import { HealthBar } from './health-bar';
 import { SpriteObject } from './interfaces/spriteObject';
 import { ParallaxMap } from './parallax-map';
 import { Player } from './player';
+import { Projectile } from './projectile';
 import { BaseZombie } from './zombie/base-zombie';
 import { BrainiacZombie } from './zombie/brainiac-zombie';
 import { NormalZombie } from './zombie/normal-zombie';
@@ -24,11 +23,19 @@ const postapo4MapSprites = [
   'assets/sprites/map/postapo4/wires.png',
 ];
 
+export const APP_HEIGHT = 1080;
+export const APP_WIDTH = 1920;
+
 export class Application {
   private app: PIXI.Application;
-  private width = window.innerWidth;
-  private height = window.innerHeight;
+  private width = APP_WIDTH;
+  private height = APP_HEIGHT;
   private player: Player;
+
+  private appStage: (delta?: number) => void;
+
+  private gameScene: PIXI.Container;
+  private gameOverScene: PIXI.Container;
 
   private objectList: Array<SpriteObject & PIXI.Container> = new Array();
 
@@ -38,15 +45,14 @@ export class Application {
     this.app = new PIXI.Application({
       width: this.width,
       height: this.height,
-      resizeTo: mainElement,
       resolution: window.devicePixelRatio,
       autoDensity: true,
     });
 
-    window.addEventListener('resize', () => this.resize());
+    // window.addEventListener('resize', () => this.resize());
     mainElement.appendChild(this.app.view);
     window.addEventListener('mousedown', () => this.onClick());
-  
+
     PIXI.Loader.shared
       .add(assetsForZombie(ZombieType.Normal))
       .add(assetsForZombie(ZombieType.Brainiac))
@@ -62,63 +68,71 @@ export class Application {
     this.height = window.innerHeight;
 
     this.app.renderer.resize(this.width, this.height);
-     this.objectList.forEach((object) => {
+    this.objectList.forEach((object) => {
       object.onResize(this.width, this.height);
     });
   };
 
   private async onClick(): Promise<void> {
     const mouseposition = this.app.renderer.plugins.interaction.mouse.global;
-    console.log( mouseposition.x)
+    console.log(mouseposition.x);
     const projectile = new Projectile(this.app);
     let playerPos = this.player.getPosition();
     let dist_Y = mouseposition.y - playerPos.y;
     let dist_X = mouseposition.x - playerPos.x;
-    let angle = Math.atan2(dist_Y,dist_X);
-    await projectile.create(playerPos.x + this.player.width - 50, playerPos.y, mouseposition.x, mouseposition.y, angle);
+    let angle = Math.atan2(dist_Y, dist_X);
+    projectile.create(playerPos.x + this.player.width - 50, playerPos.y, mouseposition.x, mouseposition.y, angle);
+    this.gameScene.addChild(projectile);
     this.objectList.push(projectile);
-  };
-
+  }
 
   private async setup(): Promise<void> {
-    this.player = new Player(this.app);
+    this.gameScene = new PIXI.Container();
+    this.gameOverScene = new PIXI.Container();
 
-    this.player.onDeadEvent = () => {
-      console.log('test', 'Player is dead');
-    };
+    this.app.stage.addChild(this.gameScene);
+    this.app.stage.addChild(this.gameOverScene);
 
     const parallaxMap = new ParallaxMap({
       renderer: this.app.renderer,
       assets: postapo4MapSprites,
     });
 
-    this.app.stage.addChild(parallaxMap);
+    this.gameScene.addChild(parallaxMap);
     this.objectList.push(parallaxMap);
 
-    await this.player.create();
-    this.player.addHealthBar(new HealthBar(this.player.width / 8, -20, 100, 100));
+    this.player = new Player();
+    this.gameScene.addChild(this.player);
+
+    this.player.onDeadEvent = () => {
+      console.log('test', 'Player is dead');
+      // this.swithToGameOver();
+    };
+
+    this.player.create();
 
     const normalZombie = new NormalZombie();
-    this.app.stage.addChild(normalZombie);
+    this.gameScene.addChild(normalZombie);
 
     const brainiacZombie = new BrainiacZombie();
     brainiacZombie.x = 1550;
     brainiacZombie.y = 850;
 
-    this.app.stage.addChild(brainiacZombie);
+    this.gameScene.addChild(brainiacZombie);
 
     this.objectList.push(this.player);
     this.objectList.push(normalZombie, brainiacZombie);
 
+    this.appStage = this.play;
+
     this.app.ticker.add((delta) => this.gameLoop(delta));
-    
   }
 
   private gameLoop = (delta: number): void => {
-    this.play(delta);
+    // console.log(this.gameScene.getBounds(true));
+    this.appStage(delta);
   };
 
- 
   private play = (delta: number): void => {
     Collisions.checkForCollisions(this.objectList.filter((obj) => !(obj as any)._destroyed));
 
@@ -130,16 +144,35 @@ export class Application {
         zombie = new BrainiacZombie();
       }
       zombie.x = Math.random() * 600 + this.app.screen.width;
-      zombie.y = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
+      const randomY = Math.random() * 200 + this.app.screen.height - 3 * zombie.height;
+      zombie.y = Math.min(randomY, this.gameScene.height - zombie.height);
       this.objectList.push(zombie);
-      this.app.stage.addChild(zombie);
+      this.gameScene.addChild(zombie);
     }
 
     this.objectList.forEach((object) => {
+      if (isDestroyed(object)) {
+        return;
+      }
       object.onUpdate(delta);
+      if (
+        !isDestroyed(object) &&
+        (object.x > this.gameScene.width + 3 * object.width || object.y > this.gameScene.height + 3 * object.height)
+      ) {
+        object.destroy({ children: true });
+      }
     });
   };
- 
+
+  private gameOver = (): void => {};
+
+  private swithToGameOver(): void {
+    this.gameScene.visible = false;
+    this.appStage = this.gameOver;
+  }
 }
 
 const app = new Application();
+function isDestroyed(object: SpriteObject & PIXI.Container) {
+  return (object as any)._destroyed;
+}
