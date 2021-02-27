@@ -5,6 +5,7 @@ import { LivingBeing } from './interfaces/living-being';
 import { SpriteObject } from './interfaces/spriteObject';
 import { Weapon } from './interfaces/weapon';
 import { Keyboard } from './keyboard';
+import { Sound } from './sound';
 import { BaseZombie } from './zombie/base-zombie';
 
 export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, Weapon {
@@ -23,9 +24,12 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
 
   public onDeadEvent: Function;
 
+  private startSound: Sound;
+
   constructor(app) {
     super(PIXI.Loader.shared.resources['assets/sprites/tram.png'].texture);
     this.app = app;
+    this.startSound = new Sound('assets/sounds/tram-select.mp3');
   }
 
   public async create(): Promise<void> {
@@ -81,6 +85,8 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     };
 
     up.press = (): void => {
+      this.startSound.play();
+
       if (
         this.y - Player.VERTICAL_TELEPORT >=
         this.app.renderer.screen.height -
