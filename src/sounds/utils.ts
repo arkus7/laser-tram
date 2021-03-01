@@ -1,6 +1,7 @@
 export function soundAssets(): string[] {
   return [
     'assets/sounds/game_over.mp3',
+    'assets/sounds/menu-select.mp3',
     'assets/sounds/laser_fire.mp3',
     'assets/sounds/muzyka-z-dooma-full.mp3',
     'assets/sounds/track-switch.mp3',
