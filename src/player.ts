@@ -17,6 +17,9 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
   private vy: number;
 
   public health = 100;
+  public maxHealth = 100;
+  public totalScore = 0;
+  private damage = 5;
 
   private static readonly SPEED = 5;
   private static readonly VERTICAL_TELEPORT = 70;
@@ -68,6 +71,10 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     const right = new Keyboard('ArrowRight');
     const up = new Keyboard('ArrowUp');
     const down = new Keyboard('ArrowDown');
+    const w = new Keyboard('w');
+    const s = new Keyboard('s');
+    const a = new Keyboard('a');
+    const d = new Keyboard('d');
 
     left.press = (): void => {
       this.vx = -Player.SPEED;
@@ -98,16 +105,35 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
           Player.VERTICAL_TELEPORT * (Player.NUM_OF_TRACKS - 1)
       ) {
         this.y -= Player.VERTICAL_TELEPORT;
+        this.angle = -2;
         this.changeTracksSound.get().play();
       }
+    };
+
+    up.release = (): void => {
+      this.angle = 0;
     };
 
     down.press = (): void => {
       if (this.y + Player.VERTICAL_TELEPORT <= APP_HEIGHT - this.height - Player.START_TRACK_RELATIVE_POSITION_Y) {
         this.y += Player.VERTICAL_TELEPORT;
+        this.angle = 2;
         this.changeTracksSound.get().play();
       }
     };
+
+    down.release = (): void => {
+      this.angle = 0;
+    };
+
+    w.press = up.press;
+    w.release = up.release;
+    s.press = down.press;
+    s.release = down.release;
+    a.press = left.press;
+    a.release = left.release;
+    d.press = right.press;
+    d.release = right.release;
   }
 
   public isCollisable(): boolean {
@@ -118,8 +144,28 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
     return this.health > 0;
   }
 
+  public addToScore(score: number): void {
+    this.totalScore += score;
+  }
+
+  public getTotalScore(): number {
+    return this.totalScore;
+  }
+
   public getDamage(): number {
-    return 5;
+    return this.damage;
+  }
+
+  public setDamage(damage: number): void {
+    this.damage = damage;
+  }
+
+  public getMaxHealth(): number {
+    return this.maxHealth;
+  }
+
+  public setMaxHealth(health: number): void {
+    this.maxHealth = health;
   }
 
   public addOnDeadEvent(callback: Function): void {
@@ -129,6 +175,8 @@ export class Player extends PIXI.Sprite implements SpriteObject, LivingBeing, We
   public onUpdate = (delta: number): void => {
     this.x += this.vx;
     this.y += this.vy;
+    // nice wiggling
+    this.pivot.y = Math.cos(Math.random() * 2);
   };
 
   public onResize = (width: number, height: number): void => {

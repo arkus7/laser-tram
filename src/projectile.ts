@@ -9,6 +9,7 @@ export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon {
   private static readonly BULLET_SPEED = 14;
 
   private fireSound: Sound;
+  private damage: number;
 
   constructor() {
     super(PIXI.Loader.shared.resources['assets/sprites/Vicodo_phone.png'].texture);
@@ -35,8 +36,12 @@ export class Projectile extends PIXI.Sprite implements SpriteObject, Weapon {
     if (this.alpha === 0) {
       return 0;
     } else {
-      return 5;
+      return this.damage;
     }
+  }
+
+  setDamage(damage: number): void {
+    this.damage = damage;
   }
 
   public create(x: number, y: number, xfinal?: number, yfinal?: number, rotation?: number): void {

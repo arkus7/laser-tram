@@ -31,5 +31,7 @@ export function spritesPerZombieState(state: ZombieState): number {
       return 10;
     case ZombieState.Walk:
       return 6;
+    case ZombieState.Jump:
+      return 7;
   }
 }
